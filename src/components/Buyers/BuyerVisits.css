@@ -1,0 +1,492 @@
+/* ── BuyerVisits ── */
+.bvi-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 20px 24px;
+  gap: 14px;
+}
+
+/* Header */
+.bvi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bvi-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bvi-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bvi-subtitle {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-top: 2px;
+}
+
+/* Investor Selector */
+.bvi-investor-sel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+.bvi-sel-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.bvi-sel-dropdown {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+}
+
+/* Hero Card */
+.bvi-hero-card {
+  background: var(--bg-white);
+  border: 1px solid #fed7aa;
+  border-radius: var(--radius-xl);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bvi-hero-card::before {
+  content: '';
+  position: absolute;
+  right: -24px;
+  top: -24px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #fff7ed;
+  opacity: 0.7;
+}
+
+.bvi-hero-left { display: flex; align-items: center; gap: 14px; }
+
+.bvi-hero-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.bvi-hero-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ea580c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.bvi-hero-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bvi-hero-contact span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+}
+
+.bvi-hero-contact svg { color: var(--text-muted); flex-shrink: 0; }
+
+/* Hero Actions */
+.bvi-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1;
+}
+
+.bvi-call-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  background: #ea580c;
+  color: #fff;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.bvi-call-btn:hover:not(:disabled) { background: #c2410c; }
+.bvi-call-btn.calling { opacity: 0.7; cursor: wait; }
+
+.bvi-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 7px 14px;
+  min-width: 220px;
+}
+
+.bvi-search svg { color: var(--text-muted); flex-shrink: 0; }
+.bvi-search input { border: none; background: transparent; font-size: 11px; color: var(--text-primary); width: 100%; outline: none; }
+.bvi-search input::placeholder { color: var(--text-muted); }
+
+/* Stage Tabs */
+.bvi-stages {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 4px;
+  width: fit-content;
+}
+
+.bvi-stage-tab {
+  padding: 7px 22px;
+  border-radius: 18px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.bvi-stage-tab:hover:not(.active) { color: var(--text-primary); background: rgba(0,0,0,0.04); }
+
+.bvi-stage-tab.active {
+  background: #22c55e;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(34,197,94,0.3);
+}
+
+/* Visit Table */
+.bvi-table-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.bvi-table-border {
+  height: 4px;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+
+.bvi-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.bvi-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bvi-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-white);
+  z-index: 2;
+  padding: 11px 18px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.bvi-table td {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.bvi-table tbody tr:last-child td { border-bottom: none; }
+.bvi-table tbody tr:hover { background: #f0fdf4; }
+
+/* Farmer Column */
+.bvi-farmer { display: flex; align-items: flex-start; gap: 10px; }
+
+.bvi-farmer-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.bvi-farmer-icon.brown { background: #fef3c7; color: #92400e; }
+
+.bvi-farmer-name {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.bvi-farmer-name.brown { color: #92400e; }
+
+.bvi-farmer-node {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.bvi-farmer-actions { display: flex; gap: 5px; margin-top: 4px; }
+
+/* Budget */
+.bvi-budget { display: flex; flex-direction: column; gap: 2px; }
+.bvi-acres { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+.bvi-budget-val { font-size: 11px; color: var(--text-muted); }
+
+/* Role Columns */
+.bvi-role-cell { display: flex; flex-direction: column; gap: 4px; }
+
+.bvi-role-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.bvi-role-name.blue  { color: #1d4ed8; }
+.bvi-role-name.orange { color: #ea580c; }
+
+.bvi-role-actions { display: flex; gap: 5px; }
+
+/* Small icon buttons */
+.bvi-small-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+}
+
+.bvi-small-btn.brown { border-color: #d97706; color: #92400e; }
+.bvi-small-btn.brown:hover { background: #fef3c7; }
+
+.bvi-small-btn.blue { border-color: #93c5fd; color: #1d4ed8; }
+.bvi-small-btn.blue:hover { background: #dbeafe; }
+
+.bvi-small-btn.orange { border-color: #fdba74; color: #ea580c; }
+.bvi-small-btn.orange:hover { background: #ffedd5; }
+
+/* Visit Situation */
+.bvi-visit-situation { display: flex; flex-direction: column; gap: 5px; }
+
+.bvi-visit-date {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.bvi-status-dropdown {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 9.5px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  border: 1.5px solid;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.bvi-status-dropdown.scheduled {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.bvi-status-dropdown.complete {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #16a34a;
+}
+
+.bvi-status-dropdown.cancelled {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+.bvi-status-dropdown.postponed {
+  background: #fffbeb;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.bvi-state {
+  text-align: center;
+  padding: 32px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Evidence Icons */
+.bvi-evidence-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #cbd5e1;
+}
+.bvi-evidence-icons svg {
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.bvi-evidence-icons svg:hover {
+  color: #94a3b8;
+}
+
+/* Sale Status */
+.bvi-sale-status-wrap {
+  display: flex;
+  align-items: center;
+}
+.bvi-sale-dropdown {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 4px 24px 4px 8px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #334155;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+}
+.bvi-sale-dropdown:hover {
+  border-color: #cbd5e1;
+}
+
+/* Mission State */
+.bvi-mission-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bvi-mission-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #10b981;
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 9.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.bvi-mission-btn:hover { background: #059669; }
+.bvi-mission-btn .arrow { font-size: 11px; margin-left: 2px; }
+
+.bvi-mission-btn-outline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid #10b981;
+  color: #10b981;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 9.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.bvi-mission-btn-outline:hover { background: #ecfdf5; }
+.bvi-mission-btn-outline svg { stroke-width: 2.5; }
+
+.bvi-mission-btn-outline.gray {
+  border-color: #cbd5e1;
+  color: #64748b;
+}
+.bvi-mission-btn-outline.gray:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.bvi-shortlisted-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: #cbd5e1;
+  letter-spacing: 0.3px;
+}

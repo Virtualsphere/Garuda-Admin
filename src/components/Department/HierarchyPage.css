@@ -1,0 +1,375 @@
+/* ── Hierarchy Page ── */
+.hierarchy-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 24px;
+}
+
+/* ── Hierarchy Header ── */
+.hierarchy-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.hierarchy-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hierarchy-title-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hierarchy-title-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pink);
+}
+
+.hierarchy-title-main h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.hierarchy-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 42px;
+}
+
+.commit-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #e84393, #fd79a8);
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 2px 10px rgba(232, 67, 147, 0.3);
+}
+
+.commit-btn:hover {
+  box-shadow: 0 4px 16px rgba(232, 67, 147, 0.45);
+  transform: translateY(-1px);
+}
+
+.commit-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.hierarchy-error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+/* ── Hierarchy Content ── */
+.hierarchy-content {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  overflow: hidden;
+}
+
+/* ── Command Roster ── */
+.command-roster {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.section-label svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.roster-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+}
+
+.roster-card-header {
+  background: linear-gradient(135deg, #2c3e6b, #1e2a3a);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.roster-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.roster-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.roster-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.roster-role {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.roster-card-body {
+  flex: 1;
+  padding: 16px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.reporting-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.reporting-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.reporting-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--blue-dark);
+  color: #ffffff;
+}
+
+.reporting-bar {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.reporting-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.roster-drop-zone {
+  flex: 1;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  min-height: 120px;
+  text-align: center;
+  padding: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.roster-drop-zone.has-items {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow-y: auto;
+  gap: 8px;
+}
+
+.roster-drop-zone.drag-over {
+  border-color: var(--pink);
+  background: rgba(232, 67, 147, 0.06);
+}
+
+.roster-item {
+  cursor: grab;
+}
+
+.roster-item.pending {
+  border: 1px dashed var(--pink);
+  opacity: 0.85;
+}
+
+.pool-remove-btn {
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pool-remove-btn:hover {
+  background: var(--bg-light);
+  color: var(--pink);
+}
+
+.roster-leader-select {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 2px 0;
+  cursor: pointer;
+}
+
+.roster-leader-select option {
+  color: #1f2937;
+}
+
+/* ── Force Pool ── */
+.force-pool {
+  width: 280px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+}
+
+.force-pool-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.force-pool-list.drag-over {
+  background: rgba(232, 67, 147, 0.06);
+  box-shadow: inset 0 0 0 2px var(--pink);
+}
+
+.force-pool-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.force-pool-item:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.pool-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pool-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pool-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pool-role {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}

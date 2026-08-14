@@ -1,0 +1,110 @@
+.login-page {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-main, #f5f6fa);
+}
+
+.login-card {
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: var(--bg-white, #ffffff);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));
+  padding: 32px 28px;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.login-logo h1 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text-primary, #1a1a2e);
+}
+
+.login-subtitle {
+  color: var(--text-secondary, #6b7280);
+  font-size: 13px;
+  margin: 4px 0 24px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+}
+
+.login-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius, 8px);
+  font-size: 14px;
+  color: var(--text-primary, #1a1a2e);
+  background: var(--bg-main, #f5f6fa);
+  transition: border-color 0.2s;
+}
+
+.login-field input:focus {
+  border-color: var(--accent, #e84393);
+}
+
+.login-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-password-wrap input {
+  padding-right: 52px;
+}
+
+.login-password-toggle {
+  position: absolute;
+  right: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent, #e84393);
+}
+
+.login-error {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--red, #ef4444);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-radius: var(--radius, 8px);
+}
+
+.login-submit {
+  margin-top: 4px;
+  padding: 11px;
+  border-radius: var(--radius, 8px);
+  background: var(--accent-gradient, linear-gradient(135deg, #e84393, #fd79a8));
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.login-submit:disabled {
+  opacity: 0.7;
+  cursor: default;
+}

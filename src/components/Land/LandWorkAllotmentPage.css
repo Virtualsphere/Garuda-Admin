@@ -1,0 +1,400 @@
+/* ── Land Work Allotment Page Layout ── */
+.lwa-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Sub Tabs ── */
+.lwa-sub-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  margin: 24px 0 16px 0;
+  background: var(--bg-white);
+  border-radius: 30px;
+  width: fit-content;
+  box-shadow: var(--shadow);
+}
+
+.lwa-sub-tab {
+  padding: 8px 20px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lwa-sub-tab:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: rgba(128, 128, 128, 0.06);
+}
+
+.lwa-sub-tab.active {
+  background: var(--bg-white);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  box-shadow: 0 2px 6px var(--accent-shadow);
+}
+
+.lwa-sub-tab:disabled {
+  color: var(--text-muted);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── LVE Context Banner ── */
+.lwa-banner {
+  background: var(--accent-gradient);
+  border-radius: var(--radius-xl);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.lwa-banner-person {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lwa-banner-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.lwa-banner-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lwa-banner-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.lwa-banner-role {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.lwa-banner-context {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.lwa-banner-context-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.lwa-banner-context select {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 220px;
+  appearance: auto;
+}
+
+.lwa-banner-context select option {
+  color: #1a1a2e;
+}
+
+/* ── Body: Personnel + Villages ── */
+.lwa-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  overflow: hidden;
+  padding-bottom: 16px;
+}
+
+.lwa-personnel-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  align-self: start;
+}
+
+.lwa-personnel-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.lwa-personnel-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.lwa-personnel-card select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-main);
+  appearance: auto;
+}
+
+/* ── Villages Panel ── */
+.lwa-villages-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lwa-villages-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.lwa-view-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px;
+}
+
+.lwa-view-toggle button {
+  padding: 8px 20px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.lwa-view-toggle button.active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.lwa-view-toggle button:disabled {
+  color: var(--text-muted);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lwa-allotable-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lwa-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 16px;
+  min-width: 220px;
+}
+
+.lwa-search input {
+  background: transparent;
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.lwa-grid-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.lwa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  padding-bottom: 16px;
+}
+
+.lwa-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lwa-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lwa-card-village {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.lwa-card-mandal {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.lwa-card-target {
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.lwa-card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lwa-card-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.lwa-card-stat-label {
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.lwa-card-stat-value {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.lwa-card-stat-value.zero {
+  color: var(--text-muted);
+}
+
+.lwa-allot-btn {
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px var(--accent-shadow);
+}
+
+.lwa-allot-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px var(--accent-shadow-lg);
+}
+
+.lwa-allot-btn:disabled {
+  background: var(--border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.lwa-error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.lwa-empty,
+.lwa-loading {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lwa-placeholder {
+  padding: 24px;
+  color: var(--text-muted);
+}

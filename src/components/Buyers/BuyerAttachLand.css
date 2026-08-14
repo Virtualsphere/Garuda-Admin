@@ -1,0 +1,418 @@
+/* ── BuyerAttachLand ── */
+.bal-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 20px 24px;
+}
+
+.bal-layout {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Left Executive Panel */
+.bal-exec-panel {
+  width: 170px;
+  flex-shrink: 0;
+}
+
+.bal-exec-card {
+  background: var(--text-primary);
+  border-radius: var(--radius-xl);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.bal-exec-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.bal-exec-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bal-exec-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.bal-exec-role {
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.bal-exec-select {
+  width: 100%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  margin-top: 4px;
+}
+
+.bal-exec-select option { color: var(--text-primary); background: #fff; }
+
+/* Center */
+.bal-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.bal-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  background: var(--bg-white);
+  border: 1.5px dashed var(--accent);
+  border-radius: var(--radius-xl);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Controls */
+.bal-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bal-mode-tabs {
+  display: flex;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px;
+}
+
+.bal-mode-tab {
+  padding: 6px 16px;
+  border-radius: 16px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.bal-mode-tab.active {
+  background: var(--text-primary);
+  color: #fff;
+}
+
+.bal-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 7px 14px;
+  flex: 1;
+}
+
+.bal-search svg { color: var(--text-muted); flex-shrink: 0; }
+
+.bal-search input {
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  color: var(--text-primary);
+  width: 100%;
+  outline: none;
+}
+
+.bal-search input::placeholder { color: var(--text-muted); }
+
+.bal-pool-count {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Table Card */
+.bal-table-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.bal-table-top-border {
+  height: 4px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.bal-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.bal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bal-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-white);
+  z-index: 2;
+  padding: 12px 20px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bal-table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.bal-table tbody tr:last-child td { border-bottom: none; }
+.bal-table tbody tr:hover { background: var(--accent-lighter); }
+
+/* Farmer */
+.bal-farmer { display: flex; align-items: center; gap: 10px; }
+
+.bal-farmer-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.bal-farmer-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.bal-farmer-sub {
+  font-size: 9.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.bal-acres {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bal-price {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Attach Button */
+.bal-attach-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--bg-white);
+  cursor: pointer;
+  transition: all 0.18s;
+  letter-spacing: 0.3px;
+}
+
+.bal-attach-btn:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.bal-attach-btn.attached {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #16a34a;
+  cursor: default;
+}
+
+/* Portfolio Panel */
+.bal-portfolio {
+  width: 200px;
+  flex-shrink: 0;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.bal-portfolio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bal-portfolio-count {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bal-portfolio-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bal-portfolio-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  padding: 20px;
+}
+
+.bal-portfolio-item {
+  background: var(--bg-main);
+  border-radius: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.bal-portfolio-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.bal-portfolio-meta {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.bal-remove-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fee2e2;
+  border: none;
+  color: #dc2626;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.bal-remove-btn:hover { background: #fecaca; }
+
+.bal-state {
+  text-align: center;
+  padding: 32px;
+  font-size: 12px;
+  color: var(--text-muted);
+}

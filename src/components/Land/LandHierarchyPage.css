@@ -1,0 +1,548 @@
+/* ── Land Hierarchy Page ── */
+.land-hierarchy-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 24px;
+}
+
+/* ── Header ── */
+.land-hier-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.land-hier-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.land-hier-title-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.land-hier-title-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.land-hier-title-main h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.land-hier-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 42px;
+}
+
+/* ── Command Hub Section ── */
+.command-hub-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.command-hub-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.command-hub-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.command-hub-desc {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.save-allotment-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--accent-gradient);
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 2px 10px var(--accent-shadow);
+}
+
+.save-allotment-btn:hover {
+  box-shadow: 0 4px 16px var(--accent-shadow-lg);
+  transform: translateY(-1px);
+}
+
+.save-allotment-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.save-allotment-btn:disabled {
+  cursor: not-allowed;
+}
+
+.land-hier-error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+/* ── Hierarchy Content ── */
+.land-hier-content {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  overflow: hidden;
+}
+
+/* ── Team Leader Cards Area ── */
+.tl-cards-area {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.tl-card {
+  flex: 1;
+  min-width: 240px;
+  max-width: 320px;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.tl-card-header {
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tl-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.tl-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.tl-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tl-name-icon {
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-shrink: 0;
+}
+
+.tl-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tl-role {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tl-card-body {
+  flex: 1;
+  padding: 14px 18px 18px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tl-reporting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.tl-reporting-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.tl-reporting-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.tl-reporting-bar {
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.tl-reporting-bar-fill {
+  height: 100%;
+  background: var(--accent-gradient);
+  border-radius: 2px;
+}
+
+.tl-drop-zone {
+  flex: 1;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  gap: 8px;
+  min-height: 100px;
+  transition: all 0.2s;
+  cursor: pointer;
+  overflow-y: auto;
+}
+
+.tl-drop-zone:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-lighter);
+}
+
+.tl-drop-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-lighter);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.tl-drop-zone.has-items {
+  border-style: solid;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 8px;
+  gap: 6px;
+  cursor: default;
+}
+
+.tl-roster-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: grab;
+}
+
+.tl-roster-item.pending {
+  border-style: dashed;
+  border-color: var(--accent);
+  opacity: 0.85;
+}
+
+.tl-roster-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--accent-gradient);
+  flex-shrink: 0;
+}
+
+.tl-roster-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.tl-roster-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tl-roster-role {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tl-roster-remove {
+  margin-left: auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.tl-roster-remove:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--accent);
+}
+
+.tl-drop-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.tl-drop-text {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Pool Section ── */
+.land-pool-section {
+  width: 260px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+}
+
+.land-pool-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.land-pool-label svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.land-pool-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+
+.land-pool-list.drag-over {
+  box-shadow: inset 0 0 0 2px var(--accent);
+  background-color: var(--accent-lighter);
+}
+
+.land-pool-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+  border-radius: var(--radius-lg);
+  cursor: grab;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.land-pool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--accent-shadow);
+}
+
+.land-pool-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.land-pool-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.land-pool-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.land-pool-name-icon {
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+}
+
+.land-pool-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.land-pool-role {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.land-pool-alert {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  color: #fbbf24;
+}
+
+/* ── Allotment Sub-tabs ── */
+.allotment-sub-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 24px;
+  margin-bottom: 12px;
+}
+
+.allotment-sub-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  transition: all 0.2s;
+  cursor: pointer;
+  background: none;
+  border: 1px solid transparent;
+  font-family: inherit;
+}
+
+.allotment-sub-tab:hover {
+  background: var(--accent-lighter);
+}
+
+.allotment-sub-tab.active {
+  border-color: var(--accent);
+  background: var(--accent-lighter);
+}
+
+.allotment-sub-tab svg {
+  width: 12px;
+  height: 12px;
+}

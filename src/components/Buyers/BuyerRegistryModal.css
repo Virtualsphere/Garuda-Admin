@@ -1,0 +1,365 @@
+/* ── Buyer Registry Modal ── */
+.brm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: brmFadeIn 0.15s ease;
+}
+
+@keyframes brmFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.brm-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 760px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Header ── */
+.brm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.brm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brm-avatar-wrap {
+  position: relative;
+}
+
+.brm-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e2e8f0;
+}
+
+.brm-status-badge {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.brm-status-badge.active { background: #22c55e; }
+.brm-status-badge.trainee { background: #3b82f6; }
+.brm-status-badge.deactive { background: #0f172a; }
+
+.brm-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.brm-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.brm-badges {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.brm-role-badge,
+.brm-dept-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--accent);
+}
+
+.brm-dept-badge {
+  color: var(--text-muted);
+}
+
+.brm-emp-id {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+}
+
+.brm-close-x {
+  color: var(--text-muted);
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.brm-close-x:hover {
+  color: var(--text-primary);
+}
+
+/* ── Tabs ── */
+.brm-tabs {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.brm-tab {
+  padding: 14px 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.brm-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ── Content ── */
+.brm-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.brm-card-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.brm-card-grid.one-col {
+  grid-template-columns: 1fr;
+}
+
+.brm-card-grid.two-col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.brm-info-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.brm-info-card {
+  background: var(--bg-main);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+
+.brm-info-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 16px;
+}
+
+.brm-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+
+.brm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.brm-field.full {
+  grid-column: 1 / -1;
+}
+
+.brm-field-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.brm-field-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.brm-field-value.block {
+  display: block;
+  margin-top: 2px;
+}
+
+.brm-field-value.cadre.lead {
+  color: var(--accent);
+}
+
+/* ── KYC proof ── */
+.brm-proof-thumb {
+  display: block;
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.brm-proof-thumb img {
+  width: 100%;
+  display: block;
+}
+
+.brm-proof-placeholder {
+  margin-top: 14px;
+  border: 1.5px dashed var(--accent-border);
+  border-radius: var(--radius-md);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 12px;
+}
+
+/* ── Contact rows (Address tab) ── */
+.brm-contact-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.brm-contact-row:last-child {
+  border-bottom: none;
+}
+
+.brm-contact-icon {
+  color: var(--accent);
+  margin-top: 2px;
+}
+
+/* ── Territorial chips ── */
+.brm-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.brm-chip {
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 5px 12px;
+  border-radius: 12px;
+}
+
+/* ── Contract row ── */
+.brm-contract-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brm-contract-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+
+.brm-contract-status.active {
+  color: #22c55e;
+  border-color: #22c55e;
+}
+
+.brm-contract-status.expired {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+/* ── Footer ── */
+.brm-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.brm-close-btn {
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 28px;
+  border-radius: 24px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px var(--accent-shadow);
+}
+
+.brm-close-btn:hover {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .brm-card-grid.two-col {
+    grid-template-columns: 1fr;
+  }
+}

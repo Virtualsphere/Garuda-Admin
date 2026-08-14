@@ -1,0 +1,726 @@
+/* ── Page Layout ── */
+.signal-audit-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Signal Header ── */
+.signal-header {
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Role Tabs ── */
+.role-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.role-tab {
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 20px;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  cursor: pointer;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  margin-right: -1px;
+  font-family: inherit;
+}
+
+.role-tab:first-child {
+  border-radius: 20px 0 0 20px;
+}
+
+.role-tab:last-child {
+  border-radius: 0 20px 20px 0;
+  margin-right: 0;
+}
+
+.role-tab:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+
+.role-tab:hover {
+  color: var(--text-primary);
+}
+
+.role-tab.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  z-index: 1;
+}
+
+.role-tab.active-blue {
+  background: var(--blue-dark);
+  color: #ffffff;
+  border-color: var(--blue-dark);
+  z-index: 1;
+}
+
+/* ── Title Row ── */
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.title-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.title-main h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.title-tier {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 42px;
+}
+
+.title-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-width: 200px;
+}
+
+.search-input svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.search-input input {
+  background: transparent;
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.search-input input::placeholder {
+  color: var(--text-muted);
+}
+
+.simulate-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.simulate-btn:hover {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* ── Content Area ── */
+.content-area {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  padding: 16px 24px;
+  overflow: hidden;
+}
+
+/* ── Signal Ledger ── */
+.signal-ledger {
+  flex: 1;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--accent-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ledger-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px 12px 20px;
+}
+
+.ledger-header-icon {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+}
+
+.ledger-header h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.ledger-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px 16px 20px;
+}
+
+.ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ledger-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 8px 14px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.ledger-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.ledger-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.ledger-table tbody td {
+  padding: 14px 8px;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+/* Signal Identity Cell */
+.signal-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.signal-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.signal-phone {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.signal-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--blue-dark);
+  margin-top: 4px;
+  width: fit-content;
+}
+
+/* Caller Type Cell */
+.caller-type {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.caller-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.caller-tag.farmer {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.caller-tag.buyer {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.caller-tag.agent {
+  background: #e8eaf6;
+  color: #3b5bdb;
+}
+
+.caller-tag.investor {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.caller-tag svg {
+  width: 10px;
+  height: 10px;
+}
+
+.caller-dept {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Mission Context */
+.mission-context {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+  max-width: 200px;
+}
+
+/* Executive */
+.executive-name {
+  color: var(--blue-dark);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+/* Duration */
+.duration-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.duration-time {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.duration-time.missed {
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.duration-timestamp {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Voice Registry */
+.voice-registry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.voice-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.voice-play {
+  color: var(--accent);
+}
+
+.voice-play:hover {
+  background: var(--accent-lighter);
+}
+
+.voice-call {
+  color: var(--accent);
+}
+
+.voice-call:hover {
+  background: var(--accent-lighter);
+}
+
+/* ── Right Panel ── */
+.right-panel {
+  width: 280px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+/* ── Metrics Card ── */
+.metrics-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--accent-border);
+  padding: 20px;
+}
+
+.metrics-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.metrics-header svg {
+  color: var(--accent);
+}
+
+.metrics-header h3 {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metrics-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.metrics-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.metrics-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.metric-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.metric-stat-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.metric-stat-value.attended {
+  color: var(--green);
+}
+
+.metric-stat-value.missed {
+  color: var(--red);
+}
+
+.metric-stat-value svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Performance Trend ── */
+.performance-section {
+  margin-top: 4px;
+}
+
+.performance-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.performance-label svg {
+  width: 14px;
+  height: 14px;
+  color: var(--accent);
+}
+
+/* ── Inbound Signals (embedded in right panel) ── */
+.inbound-signals {
+  background: linear-gradient(135deg, var(--accent), var(--accent));
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.inbound-signals-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.inbound-signals-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inbound-signals-title svg {
+  width: 14px;
+  height: 14px;
+}
+
+.inbound-signals-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inbound-signal-action-btn {
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.inbound-signal-action-btn:hover {
+  color: #ffffff;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  width: 36px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.toggle-switch.active {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.toggle-knob {
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left 0.3s;
+}
+
+.toggle-switch.active .toggle-knob {
+  left: 18px;
+}
+
+/* Signal Cards */
+.signal-cards {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.signal-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  position: relative;
+}
+
+.signal-card-badge {
+  position: absolute;
+  top: -6px;
+  right: 12px;
+  background: var(--blue-dark);
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.signal-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.signal-card-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.signal-card-location .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.signal-card-message {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.signal-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.call-now-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent));
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.call-now-btn:hover {
+  box-shadow: 0 4px 12px var(--accent-shadow-lg);
+  transform: translateY(-1px);
+}
+
+.call-now-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.signal-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+  background: none;
+  cursor: pointer;
+}
+
+.signal-action-btn:hover {
+  background: var(--bg-main);
+  color: var(--text-primary);
+}

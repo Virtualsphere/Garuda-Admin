@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── Reset & Base ── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* ── Shared ── */
+  --bg-main: #f5f6fa;
+  --bg-white: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #e5e7eb;
+  --border-light: #f0f0f0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --blue-dark: #2c3e6b;
+  --blue-navy: #1e2a3a;
+  --green: #22c55e;
+  --red: #ef4444;
+}
+
+/* ═══════════════════════════════════════
+   THEME: Call Center (Pink)
+   ═══════════════════════════════════════ */
+[data-theme="callcenter"] {
+  --accent: #e84393;
+  --accent-dark: #c0357a;
+  --accent-light: #fce4ec;
+  --accent-lighter: #fff0f3;
+  --accent-border: #f8a4c8;
+  --accent-gradient: linear-gradient(135deg, #e84393, #fd79a8);
+  --accent-shadow: rgba(232, 67, 147, 0.25);
+  --accent-shadow-lg: rgba(232, 67, 147, 0.4);
+
+  /* Sidebar (Now Light/White for Call Center too) */
+  --sidebar-bg: #ffffff;
+  --sidebar-width: 200px;
+  --sidebar-text: #6b7280;
+  --sidebar-text-hover: #1a1a2e;
+  --sidebar-active: #e84393;
+  --sidebar-active-bg: rgba(232, 67, 147, 0.08);
+  --sidebar-icon: #9ca3af;
+  --sidebar-logo-text: #1a1a2e;
+  --sidebar-border: #e5e7eb;
+  --sidebar-user-name: #1a1a2e;
+  --sidebar-user-email: #6b7280;
+  --sidebar-divider: #e5e7eb;
+}
+
+/* ═══════════════════════════════════════
+   THEME: Land (Green)
+   ═══════════════════════════════════════ */
+[data-theme="land"] {
+  --accent: #2f9e44;
+  --accent-dark: #1a7a30;
+  --accent-light: #d4edda;
+  --accent-lighter: #f0faf3;
+  --accent-border: #82d69a;
+  --accent-gradient: linear-gradient(135deg, #2f9e44, #40c463);
+  --accent-shadow: rgba(47, 158, 68, 0.25);
+  --accent-shadow-lg: rgba(47, 158, 68, 0.4);
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-width: 200px;
+  --sidebar-text: #6b7280;
+  --sidebar-text-hover: #1a1a2e;
+  --sidebar-active: #2f9e44;
+  --sidebar-active-bg: rgba(47, 158, 68, 0.08);
+  --sidebar-icon: #9ca3af;
+  --sidebar-logo-text: #1a1a2e;
+  --sidebar-border: #e5e7eb;
+  --sidebar-user-name: #1a1a2e;
+  --sidebar-user-email: #6b7280;
+  --sidebar-divider: #e5e7eb;
+}
+
+/* ═══════════════════════════════════════
+   THEME: Farmers (Rust/Brown)
+   ═══════════════════════════════════════ */
+[data-theme="farmers"] {
+  --accent: #a16207;
+  --accent-dark: #854d0e;
+  --accent-light: #fef9c3;
+  --accent-lighter: #fefce8;
+  --accent-border: #fde047;
+  --accent-gradient: linear-gradient(135deg, #a16207, #ca8a04);
+  --accent-shadow: rgba(161, 98, 7, 0.25);
+  --accent-shadow-lg: rgba(161, 98, 7, 0.4);
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-width: 200px;
+  --sidebar-text: #6b7280;
+  --sidebar-text-hover: #1a1a2e;
+  --sidebar-active: #a16207;
+  --sidebar-active-bg: rgba(161, 98, 7, 0.08);
+  --sidebar-icon: #9ca3af;
+  --sidebar-logo-text: #1a1a2e;
+  --sidebar-border: #e5e7eb;
+  --sidebar-user-name: #1a1a2e;
+  --sidebar-user-email: #6b7280;
+  --sidebar-divider: #e5e7eb;
+}
+
+/* ═══════════════════════════════════════
+   THEME: Agents (Slate/Indigo)
+   ═══════════════════════════════════════ */
+[data-theme="agents"] {
+  --accent: #475569;
+  --accent-dark: #334155;
+  --accent-light: #f1f5f9;
+  --accent-lighter: #f8fafc;
+  --accent-border: #cbd5e1;
+  --accent-gradient: linear-gradient(135deg, #475569, #64748b);
+  --accent-shadow: rgba(71, 85, 105, 0.25);
+  --accent-shadow-lg: rgba(71, 85, 105, 0.4);
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-width: 200px;
+  --sidebar-text: #6b7280;
+  --sidebar-text-hover: #1a1a2e;
+  --sidebar-active: #475569;
+  --sidebar-active-bg: rgba(71, 85, 105, 0.08);
+  --sidebar-icon: #9ca3af;
+  --sidebar-logo-text: #1a1a2e;
+  --sidebar-border: #e5e7eb;
+  --sidebar-user-name: #1a1a2e;
+  --sidebar-user-email: #6b7280;
+  --sidebar-divider: #e5e7eb;
+}
+
+/* ═══════════════════════════════════════
+   THEME: HR (Monochrome/Slate)
+   ═══════════════════════════════════════ */
+[data-theme="hr"] {
+  --accent: #64748b;
+  --accent-dark: #475569;
+  --accent-light: #f1f5f9;
+  --accent-lighter: #f8fafc;
+  --accent-border: #e2e8f0;
+  --accent-gradient: linear-gradient(135deg, #475569, #64748b);
+  --accent-shadow: rgba(100, 116, 139, 0.25);
+  --accent-shadow-lg: rgba(100, 116, 139, 0.4);
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-width: 200px;
+  --sidebar-text: #6b7280;
+  --sidebar-text-hover: #1a1a2e;
+  --sidebar-active: #1e293b;
+  --sidebar-active-bg: #f1f5f9;
+  --sidebar-icon: #9ca3af;
+  --sidebar-logo-text: #1a1a2e;
+  --sidebar-border: #e5e7eb;
+  --sidebar-user-name: #1a1a2e;
+  --sidebar-user-email: #6b7280;
+  --sidebar-divider: #e5e7eb;
+}
+
+/* ═══════════════════════════════════════
+   THEME: Settings (Monochrome/Black)
+   ═══════════════════════════════════════ */
+[data-theme="settings"] {
+  --accent: #0f172a;
+  --accent-dark: #000000;
+  --accent-light: #f1f5f9;
+  --accent-lighter: #f8fafc;
+  --accent-border: #e2e8f0;
+  --accent-gradient: linear-gradient(135deg, #000000, #334155);
+  --accent-shadow: rgba(0, 0, 0, 0.15);
+  --accent-shadow-lg: rgba(0, 0, 0, 0.25);
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-width: 200px;
+  --sidebar-text: #6b7280;
+  --sidebar-text-hover: #1a1a2e;
+  --sidebar-active: #0f172a;
+  --sidebar-active-bg: #f1f5f9;
+  --sidebar-icon: #9ca3af;
+  --sidebar-logo-text: #1a1a2e;
+  --sidebar-border: #e5e7eb;
+  --sidebar-user-name: #1a1a2e;
+  --sidebar-user-email: #6b7280;
+  --sidebar-divider: #e5e7eb;
+}
+
+/* ═══════════════════════════════════════
+   THEME: Buyers (Red/Rose)
+   ═══════════════════════════════════════ */
+[data-theme="buyers"] {
+  --accent: #e11d48;
+  --accent-dark: #be123c;
+  --accent-light: #ffe4e6;
+  --accent-lighter: #fff1f2;
+  --accent-border: #fda4af;
+  --accent-gradient: linear-gradient(135deg, #e11d48, #f43f5e);
+  --accent-shadow: rgba(225, 29, 72, 0.22);
+  --accent-shadow-lg: rgba(225, 29, 72, 0.38);
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-width: 200px;
+  --sidebar-text: #6b7280;
+  --sidebar-text-hover: #1a1a2e;
+  --sidebar-active: #e11d48;
+  --sidebar-active-bg: rgba(225, 29, 72, 0.08);
+  --sidebar-icon: #9ca3af;
+  --sidebar-logo-text: #1a1a2e;
+  --sidebar-border: #e5e7eb;
+  --sidebar-user-name: #1a1a2e;
+  --sidebar-user-email: #6b7280;
+  --sidebar-divider: #e5e7eb;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+input {
+  font-family: inherit;
+  border: none;
+  outline: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}

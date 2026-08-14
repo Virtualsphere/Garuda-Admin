@@ -1,0 +1,478 @@
+/* ── Farmers Calls Page Layout ── */
+.f-calls-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 24px;
+}
+
+/* ── Sub Tabs ── */
+.f-calls-sub-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 4px;
+  width: fit-content;
+  margin-top: 20px;
+  margin-bottom: 24px;
+}
+
+.f-calls-sub-tab {
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.f-calls-sub-tab.active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* ── Header ── */
+.f-calls-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.f-calls-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.f-calls-icon {
+  color: var(--accent);
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+}
+
+.f-calls-title-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.f-calls-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.f-calls-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.f-calls-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 10px 16px;
+  min-width: 280px;
+}
+
+.f-calls-search svg {
+  color: var(--text-muted);
+}
+
+.f-calls-search input {
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.f-calls-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Layout ── */
+.f-calls-layout {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.f-calls-main-col {
+  flex: 2.2;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.f-calls-side-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* ── Card Styling ── */
+.f-calls-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.f-calls-card-header {
+  padding: 16px 24px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.f-calls-card-header svg {
+  color: var(--accent);
+}
+
+.f-calls-main-col .f-calls-card-header {
+  border-top: 4px solid var(--text-primary);
+}
+
+.f-calls-side-col .f-calls-card-header {
+  border-top: 4px solid var(--accent);
+}
+
+/* ── Ledger Table ── */
+.f-ledger-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.f-ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.f-ledger-table th,
+.f-ledger-table td {
+  padding: 16px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.f-ledger-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-white);
+  z-index: 2;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.f-ledger-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Ledger Cells */
+.f-ledger-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.f-ledger-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.f-ledger-phone {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.f-ledger-phone svg {
+  color: var(--accent);
+}
+
+.f-ledger-context {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.f-ledger-exec {
+  font-size: 11px;
+  font-weight: 700;
+  color: #3b82f6; /* Blue for exec */
+  text-transform: uppercase;
+}
+
+.f-ledger-tl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.f-ledger-duration {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.f-ledger-dur-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.f-ledger-dur-time.missed {
+  color: var(--red);
+}
+
+.f-ledger-dur-sub {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.f-ledger-voice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.f-voice-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  background: var(--bg-white);
+}
+
+.f-voice-btn:hover {
+  background: var(--bg-main);
+  color: var(--text-primary);
+}
+
+.f-voice-btn.play svg {
+  color: var(--accent);
+  fill: var(--accent);
+}
+
+/* ── Real-time Metrics ── */
+.f-metrics-content {
+  padding: 24px;
+}
+
+.f-metric-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.f-metric-val {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.f-metrics-split {
+  display: flex;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
+}
+
+.f-metric-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.f-metric-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.f-metric-stat.success svg { color: var(--green); }
+.f-metric-stat.danger svg { color: var(--red); }
+
+/* ── Squad Performance Audit ── */
+.f-squad-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.f-squad-table th {
+  padding: 12px 24px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.f-squad-table th:first-child {
+  text-align: left;
+}
+
+.f-squad-table td {
+  padding: 12px 24px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.f-squad-table td:first-child {
+  text-align: left;
+}
+
+.f-squad-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.f-squad-staff {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.f-squad-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.f-squad-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.f-squad-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.f-squad-val {
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.f-squad-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.f-squad-badge.danger {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.f-squad-badge.safe {
+  background: #dcfce7;
+  color: #22c55e;
+}
+
+/* ── 7-Day Trend ── */
+.f-trend-content {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.f-trend-line {
+  width: 100%;
+  height: 60px;
+}
+
+/* Floating Action Button */
+.f-calls-fab {
+  position: absolute;
+  bottom: 80px; /* Above the inbound signals */
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--accent);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 50;
+}
+
+.f-calls-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px var(--accent-shadow-lg);
+}

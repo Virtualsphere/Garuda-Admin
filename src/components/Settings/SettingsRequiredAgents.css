@@ -1,0 +1,120 @@
+/* ── Settings Required Agents Page ── */
+.settings-agents-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+  overflow-y: auto;
+}
+
+/* We reuse .settings-header and .settings-actions from SettingsVisiting.css */
+
+.settings-agents-content {
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: 32px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+.settings-agents-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 60px;
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 10px;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-agents-table-header div:nth-child(3),
+.settings-agents-table-header div:nth-child(4) {
+  text-align: center;
+}
+
+.settings-agents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 0;
+}
+
+.settings-agents-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 60px;
+  gap: 24px;
+  align-items: center;
+}
+
+.settings-agents-input {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.settings-agents-input:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.settings-agents-goal-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-agents-goal-input {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  width: 80px;
+  text-align: center;
+}
+
+.settings-agents-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.settings-agents-action:hover {
+  color: #ef4444;
+}
+
+.settings-agents-add-btn {
+  border: 1px dashed #cbd5e1;
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.settings-agents-add-btn:hover {
+  border-color: #94a3b8;
+  color: #64748b;
+  background: #f8fafc;
+}

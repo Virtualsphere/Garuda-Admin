@@ -1,0 +1,287 @@
+/* ── Farmers Onboard Layout ── */
+.f-onboard-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0 24px;
+}
+
+/* ── Header ── */
+.f-onboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.f-onboard-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.f-onboard-icon {
+  color: var(--accent);
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+}
+
+.f-onboard-title-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.f-onboard-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.f-onboard-subtitle {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.f-onboard-commit-btn {
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 20px; /* rounded pill style */
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px var(--accent-shadow);
+}
+
+.f-onboard-commit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px var(--accent-shadow-lg);
+  background: var(--accent-dark);
+}
+
+/* ── Sections ── */
+.f-onboard-section {
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 24px 32px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.f-onboard-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.f-onboard-section-title svg {
+  color: var(--accent);
+}
+
+/* ── Grid Forms ── */
+.f-form-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.f-form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.f-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.f-form-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.f-form-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.f-form-select svg {
+  color: var(--text-muted);
+}
+
+.f-form-input {
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.f-form-input::placeholder {
+  color: var(--text-muted);
+}
+
+.f-form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-white);
+}
+
+/* ── Location Block ── */
+.f-location-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.f-location-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.f-location-btn:hover {
+  background: var(--bg-white);
+  border-color: var(--text-primary);
+}
+
+.f-location-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ── Radios ── */
+.f-radio-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 40px; /* Align with inputs */
+}
+
+.f-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.f-radio-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.f-radio-circle::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+/* Selected state mock */
+.f-radio-option.selected .f-radio-circle::after {
+  background: var(--accent);
+}
+
+/* ── Native Select (replaces fake div selects) ── */
+.f-form-select-native {
+  display: block;
+  width: 100%;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  appearance: auto;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.f-form-select-native:focus {
+  border-color: var(--accent);
+}
+
+.f-form-select-native:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Active radio style ── */
+.f-radio-circle.active::after {
+  background: var(--accent);
+}
+
+/* ── Submit message ── */
+.f-onboard-message {
+  margin: 0 0 16px 0;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.f-onboard-message.success {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.f-onboard-message.error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ── Disabled button ── */
+.f-onboard-commit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+

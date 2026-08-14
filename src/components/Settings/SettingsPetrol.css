@@ -1,0 +1,201 @@
+/* ── Settings Petrol Page ── */
+.settings-petrol-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+  overflow-y: auto;
+}
+
+/* We reuse .settings-header and .settings-actions from SettingsVisiting.css */
+
+.settings-petrol-layout {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Left Panel */
+.settings-petrol-left {
+  flex: 1;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-top: 4px solid #22c55e; /* Green border */
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+}
+
+.settings-petrol-card-header {
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+}
+
+.settings-petrol-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-petrol-card-title svg {
+  color: #64748b;
+}
+
+.settings-petrol-card-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+}
+
+.settings-petrol-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.settings-petrol-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-petrol-input-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.settings-petrol-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 240px;
+}
+
+.settings-petrol-input-icon {
+  position: absolute;
+  left: 16px;
+  color: #94a3b8;
+}
+
+.settings-petrol-input {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 16px 16px 48px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.settings-petrol-active-badge {
+  border: 2px dashed #cbd5e1;
+  border-radius: 20px;
+  padding: 12px 24px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-petrol-info-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  gap: 16px;
+}
+
+.settings-petrol-info-box svg {
+  color: #475569;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.settings-petrol-info-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+
+/* Right Panel */
+.settings-petrol-right {
+  flex: 1;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-top: 4px solid #0f172a; /* Black/Dark border */
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+}
+
+.settings-petrol-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-top: 16px;
+}
+
+.settings-petrol-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-petrol-date {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  width: 100px;
+}
+
+.settings-petrol-rate-val {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-primary);
+  flex: 1;
+  text-align: center;
+}
+
+.settings-petrol-status {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 80px;
+  text-align: center;
+}
+
+.settings-petrol-status.active {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.settings-petrol-status.archived {
+  background: #f1f5f9;
+  color: #94a3b8;
+}

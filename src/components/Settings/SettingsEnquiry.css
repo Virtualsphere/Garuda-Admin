@@ -1,0 +1,133 @@
+/* ── Settings Enquiry Page ── */
+.settings-enquiry-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+  overflow-y: auto;
+}
+
+/* We reuse .settings-header and common buttons from the main classes, 
+   but since they aren't global, we'll define them here or move them. 
+   To be safe, I'll define specific classes or rely on the same class names. 
+   I will just redefine them for Enquiry to ensure independence. */
+
+.settings-enquiry-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.settings-enquiry-left {
+  flex: 1;
+  background: var(--bg-white);
+  border: 1px solid #3b82f6; /* Blue border */
+  border-radius: 32px 32px 32px 32px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-enquiry-panel-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.settings-enquiry-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #1d4ed8; /* Darker blue */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-enquiry-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-top: 6px;
+  letter-spacing: 0.5px;
+}
+
+.settings-enquiry-content {
+  padding: 64px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.settings-enquiry-rate-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 64px;
+}
+
+.settings-enquiry-rate-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-enquiry-rate-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.settings-enquiry-rate-symbol {
+  position: absolute;
+  left: 20px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #3b82f6;
+}
+
+.settings-enquiry-rate-input {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px 16px 48px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+  width: 280px;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.settings-enquiry-info-banner {
+  background: #eff6ff; /* Light blue bg */
+  border-radius: 20px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #1d4ed8;
+  width: 80%;
+  max-width: 600px;
+}
+
+.settings-enquiry-info-banner svg {
+  flex-shrink: 0;
+}
+
+.settings-enquiry-info-text {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.5;
+  letter-spacing: 0.5px;
+}

@@ -1,0 +1,461 @@
+/* ── BuyerEnquiry ── */
+.beq-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 20px 24px;
+  gap: 16px;
+}
+
+/* Header */
+.beq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.beq-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--accent);
+}
+
+.beq-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.beq-subtitle {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-top: 2px;
+}
+
+/* Investor Selector */
+.beq-investor-sel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+.beq-sel-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.beq-sel-dropdown {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+  min-width: 200px;
+}
+
+/* Hero Card */
+.beq-hero-card {
+  background: var(--bg-white);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-xl);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.beq-hero-card::before {
+  content: '';
+  position: absolute;
+  right: -30px;
+  top: -30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--accent-lighter);
+  opacity: 0.6;
+}
+
+.beq-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.beq-hero-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.beq-hero-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.beq-hero-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.beq-hero-contact span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.beq-hero-contact svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Hero Actions */
+.beq-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.beq-call-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 24px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s;
+  letter-spacing: 0.3px;
+}
+
+.beq-call-btn:hover:not(:disabled) {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+}
+
+.beq-call-btn.calling {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.beq-mic-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: var(--bg-white);
+  transition: all 0.18s;
+}
+
+.beq-mic-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.beq-hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.beq-parcels {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.beq-first-visit-btn {
+  padding: 8px 18px;
+  background: var(--text-primary);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.18s;
+  white-space: nowrap;
+}
+
+.beq-first-visit-btn:hover {
+  background: #111;
+}
+
+/* Portfolio Table */
+.beq-table-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border-top: 4px solid var(--accent);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.beq-table-header {
+  padding: 14px 24px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.beq-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.beq-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.beq-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-white);
+  z-index: 2;
+  padding: 11px 16px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.beq-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.beq-table tbody tr:last-child td { border-bottom: none; }
+.beq-table tbody tr:hover { background: var(--accent-lighter); }
+
+/* Farmer Identity Cell */
+.beq-farmer-id {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.beq-farmer-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.beq-farmer-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.beq-farmer-contacts {
+  display: flex;
+  gap: 10px;
+  margin-top: 3px;
+}
+
+.beq-farmer-contacts span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  color: var(--text-muted);
+}
+
+.beq-farmer-tags {
+  display: flex;
+  gap: 5px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.beq-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.beq-tag.town { background: #f3f4f6; color: var(--text-secondary); }
+.beq-tag.acres { background: var(--accent-lighter); color: var(--accent); }
+.beq-tag.code { background: #dbeafe; color: #1d4ed8; }
+
+/* Dropdowns */
+.beq-select-wrap { width: 160px; }
+
+.beq-dropdown {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-white);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.18s;
+}
+
+.beq-dropdown:focus { border-color: var(--accent); }
+
+/* Valuation */
+.beq-val-amount {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Sync */
+.beq-sync {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.beq-sync-days { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+.beq-sync-label { font-size: 8.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+.beq-sync-date { font-size: 9px; color: var(--text-muted); }
+
+/* Mediator Hub */
+.beq-mediator-hub { display: flex; flex-direction: column; gap: 4px; }
+
+.beq-mediator-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.beq-mediator-actions { display: flex; gap: 6px; }
+
+.beq-icon-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s;
+  background: var(--bg-white);
+}
+
+.beq-icon-btn.call { color: var(--accent); border-color: var(--accent-border); background: var(--accent-lighter); }
+.beq-icon-btn.mic { color: var(--text-muted); }
+.beq-icon-btn:hover { transform: scale(1.1); }
+
+/* Cart Button */
+.beq-cart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.beq-cart-btn:hover:not(:disabled) {
+  background: var(--accent-dark);
+}
+
+.beq-cart-btn.added {
+  background: #22c55e;
+  cursor: default;
+}
+
+.beq-cart-btn.loading {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.beq-state {
+  text-align: center;
+  padding: 32px;
+  font-size: 12px;
+  color: var(--text-muted);
+}

@@ -1,0 +1,510 @@
+/* ── Land Wallet Page Layout ── */
+.land-wallet-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 24px;
+}
+
+/* ── Header ── */
+.wallet-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.wallet-title-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
+  margin-top: 2px;
+}
+
+.wallet-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wallet-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wallet-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Track Switcher & Search ── */
+.wallet-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.track-switcher {
+  display: flex;
+  align-items: center;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 4px;
+  min-width: 300px;
+}
+
+.track-btn {
+  flex: 1;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.track-btn.active {
+  background: var(--bg-white);
+  color: var(--text-primary);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.wallet-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 10px 16px;
+  min-width: 280px;
+}
+
+.wallet-search svg {
+  color: var(--text-muted);
+}
+
+.wallet-search input {
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.wallet-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── View Switcher & Month ── */
+.wallet-sub-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.audit-tabs {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.audit-tab {
+  padding-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.audit-tab.active {
+  color: var(--accent);
+}
+
+.audit-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 3px 3px 0 0;
+}
+
+.month-selector {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 8px 16px;
+}
+
+.month-btn {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.month-btn:hover {
+  color: var(--text-primary);
+}
+
+.month-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 100px;
+  text-align: center;
+}
+
+/* ── Content Area ── */
+.wallet-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Protocol Box ── */
+.protocol-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.protocol-icon {
+  color: var(--accent);
+}
+
+.protocol-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.protocol-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.protocol-desc {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.protocol-desc span {
+  color: var(--accent);
+}
+
+/* ── Daily Audit Specifics ── */
+.role-toggles {
+  display: flex;
+  align-items: center;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 4px;
+  width: fit-content;
+  margin-bottom: 16px;
+}
+
+.role-toggle {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+
+.role-toggle.active {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.daily-audit-card {
+  flex: 1;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--border);
+  border-top: 4px solid var(--accent);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.daily-audit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.person-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.person-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.person-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.person-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.person-role {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.person-role svg {
+  width: 12px;
+  height: 12px;
+}
+
+.person-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.person-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.person-code {
+  font-size: 10px;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.active-dropdown-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.active-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-primary);
+  min-width: 220px;
+  cursor: pointer;
+}
+
+.active-dropdown svg {
+  color: var(--text-muted);
+}
+
+.sync-btn {
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px var(--accent-shadow);
+}
+
+.sync-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--accent-shadow-lg);
+}
+
+.daily-audit-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--border);
+}
+
+.vacant-icon {
+  width: 64px;
+  height: 64px;
+}
+
+.vacant-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--border);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ── Monthly Calculation Table ── */
+.monthly-table-container {
+  flex: 1;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--border);
+  border-top: 4px solid var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.monthly-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.monthly-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.monthly-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-white);
+  z-index: 2;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.monthly-table thead th:not(:first-child) {
+  text-align: right;
+}
+
+.monthly-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.monthly-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.monthly-table tbody td {
+  padding: 16px 24px;
+  vertical-align: middle;
+}
+
+.monthly-table tbody td:not(:first-child) {
+  text-align: right;
+}
+
+.monthly-person-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.monthly-person-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.monthly-person-role {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.monthly-val-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.monthly-val-green {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.monthly-val-bold {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}

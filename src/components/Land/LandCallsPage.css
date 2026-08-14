@@ -1,0 +1,680 @@
+/* ══════════════════════════════════════════════
+   Land Calls Page — LandCallsPage.css
+   ══════════════════════════════════════════════ */
+
+/* ── Page Shell ── */
+.lc-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 24px;
+  position: relative;
+}
+
+/* ══════════════════════
+   Tier Sub-Tabs
+══════════════════════ */
+.lc-sub-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 4px;
+  width: fit-content;
+  margin-top: 20px;
+  margin-bottom: 22px;
+}
+
+.lc-sub-tab {
+  padding: 7px 22px;
+  border-radius: 18px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.lc-sub-tab:hover:not(.disabled):not(.active) {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.lc-sub-tab.active {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--accent-shadow);
+}
+
+.lc-sub-tab.disabled {
+  color: var(--text-muted);
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+/* ══════════════════════
+   Header
+══════════════════════ */
+.lc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+
+.lc-title-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lc-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--accent-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.lc-icon-wrap svg {
+  width: 20px;
+  height: 20px;
+}
+
+.lc-title-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lc-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+
+.lc-subtitle {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  opacity: 0.8;
+}
+
+.lc-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 10px 18px;
+  min-width: 260px;
+  transition: border-color 0.2s;
+}
+
+.lc-search:focus-within {
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-shadow);
+}
+
+.lc-search svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.lc-search input {
+  font-size: 12px;
+  color: var(--text-primary);
+  width: 100%;
+  background: transparent;
+}
+
+.lc-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ══════════════════════
+   Two-Column Layout
+══════════════════════ */
+.lc-layout {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Left Column ── */
+.lc-main-col {
+  flex: 2.4;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ── Right Column ── */
+.lc-side-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-right: 2px;
+  min-width: 0;
+}
+
+/* ══════════════════════
+   Card Shared
+══════════════════════ */
+.lc-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.lc-card-header {
+  padding: 14px 20px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lc-card-header svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Left column card header: dark top border */
+.lc-main-col .lc-card-header {
+  border-top: 3px solid var(--text-primary);
+}
+
+/* Right column cards: accent top border */
+.lc-side-col .lc-card-header {
+  border-top: 3px solid var(--accent);
+}
+
+/* ══════════════════════
+   Ledger Table
+══════════════════════ */
+.lc-ledger-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.lc-ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.lc-ledger-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-white);
+  padding: 12px 20px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.lc-ledger-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.lc-ledger-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.lc-ledger-table tbody tr {
+  transition: background 0.15s;
+}
+
+.lc-ledger-table tbody tr:hover {
+  background: var(--accent-lighter);
+}
+
+.lc-ledger-table tbody tr.missed-row {
+  opacity: 0.65;
+}
+
+/* ── Signal Identity Cell ── */
+.lc-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lc-caller-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.lc-caller-phone {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.lc-land-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #ffffff;
+  background: var(--accent);
+  padding: 2px 7px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 1px;
+}
+
+/* ── Mission Context Cell ── */
+.lc-context {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ── Executive Cell ── */
+.lc-exec-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ── Duration Cell ── */
+.lc-duration {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lc-dur-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.lc-dur-time.missed {
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.lc-dur-sub {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ── Voice Registry Buttons ── */
+.lc-voice-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lc-voice-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+  background: var(--bg-white);
+  cursor: pointer;
+}
+
+.lc-voice-btn.play {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-lighter);
+}
+
+.lc-voice-btn.play svg {
+  fill: var(--accent);
+}
+
+.lc-voice-btn.play:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lc-voice-btn.call {
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
+.lc-voice-btn.call:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 2px 8px var(--accent-shadow);
+  transform: scale(1.05);
+}
+
+.lc-voice-btn.call.dialing {
+  background: var(--accent-light);
+  border-color: var(--accent-border);
+  animation: dialPulse 0.9s infinite ease-in-out;
+}
+
+.lc-voice-btn.call:disabled:not(.dialing) {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+@keyframes dialPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* ── Loading / Empty State ── */
+.lc-state-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.lc-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ══════════════════════
+   Metrics Card
+══════════════════════ */
+.lc-metrics-body {
+  padding: 20px;
+}
+
+.lc-metric-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+.lc-metric-talk {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1.1;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.lc-metrics-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-light);
+}
+
+.lc-metric-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lc-metric-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border-light);
+  margin: 0 16px;
+}
+
+.lc-metric-stat {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.lc-metric-stat.success svg {
+  color: var(--green);
+}
+
+.lc-metric-stat.danger svg {
+  color: var(--red);
+}
+
+/* ══════════════════════
+   Squad Table
+══════════════════════ */
+.lc-squad-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lc-squad-table th {
+  padding: 10px 20px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.lc-squad-table th:first-child {
+  text-align: left;
+}
+
+.lc-squad-table td {
+  padding: 10px 20px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.lc-squad-table td:first-child {
+  text-align: left;
+}
+
+.lc-squad-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.lc-squad-table tbody tr:hover {
+  background: var(--bg-main);
+}
+
+.lc-squad-staff {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lc-squad-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg-main);
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border-light);
+}
+
+.lc-squad-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lc-squad-name {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.lc-squad-val {
+  font-size: 11px;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.lc-squad-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.lc-squad-badge.danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.lc-squad-badge.safe {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+/* ══════════════════════
+   7-Day Trend Card
+══════════════════════ */
+.lc-trend-card {
+  flex: 1;
+}
+
+.lc-trend-body {
+  padding: 16px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lc-trend-svg {
+  width: 100%;
+  height: 70px;
+  overflow: visible;
+}
+
+.lc-trend-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.lc-trend-labels span {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ══════════════════════
+   Error Toast
+══════════════════════ */
+.lc-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 24px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  animation: toastIn 0.2s ease;
+}
+
+.lc-toast.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.lc-toast.error svg {
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

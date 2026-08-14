@@ -1,0 +1,326 @@
+/* ── Land Crew Page ── */
+.land-crew-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 24px;
+}
+
+/* ── Header ── */
+.land-crew-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.land-crew-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.land-crew-title-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.land-crew-title-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.land-crew-title-main h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.land-crew-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 42px;
+}
+
+.land-crew-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-width: 200px;
+}
+
+.land-crew-search svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.land-crew-search input {
+  background: transparent;
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.land-crew-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Table Container ── */
+.land-crew-table-container {
+  flex: 1;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--accent-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+/* ── Team Section Header ── */
+.team-section-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px 10px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.team-section-header::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 2px;
+  margin-right: 10px;
+}
+
+.land-crew-table-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.land-crew-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.land-crew-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-white);
+}
+
+.land-crew-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.land-crew-table thead th:first-child {
+  padding-left: 20px;
+}
+
+.land-crew-table thead th:last-child {
+  padding-right: 20px;
+  text-align: center;
+}
+
+.land-crew-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s;
+}
+
+.land-crew-table tbody tr:hover {
+  background: rgba(47, 158, 68, 0.02);
+}
+
+.land-crew-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.land-crew-table tbody td {
+  padding: 12px 12px;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+.land-crew-table tbody td:first-child {
+  padding-left: 20px;
+}
+
+.land-crew-table tbody td:last-child {
+  padding-right: 20px;
+  text-align: center;
+}
+
+/* ── Personnel Identity ── */
+.land-personnel-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.land-personnel-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.land-personnel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.land-personnel-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.land-personnel-code {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── Cadre Tags ── */
+.land-cadre-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.land-cadre-tag svg {
+  width: 10px;
+  height: 10px;
+}
+
+.land-cadre-tag.head {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.land-cadre-tag.team-leader {
+  background: var(--accent-dark);
+  color: #ffffff;
+}
+
+.land-cadre-tag.executive {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* ── Shared Cell Styles ── */
+.land-date-cell,
+.land-node-cell,
+.land-contact-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.land-date-cell svg,
+.land-node-cell svg,
+.land-contact-cell svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Status Badges ── */
+.land-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.land-status-badge.active {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.land-status-badge.trainee {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.land-status-badge.applied {
+  background: var(--blue-dark);
+  color: #ffffff;
+}
+
+/* ── Audit Chevron ── */
+.land-audit-chevron {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.land-audit-chevron:hover {
+  background: var(--bg-main);
+  color: var(--text-primary);
+}

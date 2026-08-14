@@ -1,0 +1,466 @@
+/* ── Attendance Page ── */
+.att-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 24px;
+}
+
+/* ── Header ── */
+.att-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.att-title-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.att-title-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.att-title-main h2 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.att-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* ── Month Navigator ── */
+.att-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 6px 14px;
+  flex-shrink: 0;
+}
+
+.att-month-nav span {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+  min-width: 68px;
+  text-align: center;
+}
+
+.att-month-nav button {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+
+.att-month-nav button:hover {
+  background: var(--accent-light);
+}
+
+.att-month-nav svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── Save Button ── */
+.att-save-btn {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  border: none;
+  border-radius: 24px;
+  padding: 10px 22px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px var(--accent-shadow);
+  transition: opacity 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.att-save-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.att-save-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ── View Toggle Tabs ── */
+.att-view-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 14px;
+  width: fit-content;
+}
+
+.att-view-tab {
+  padding: 9px 20px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.att-view-tab:hover {
+  color: var(--text-primary);
+}
+
+.att-view-tab.active {
+  background: var(--text-primary);
+  color: #ffffff;
+}
+
+/* ── Search Row ── */
+.att-search-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.att-search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent-lighter);
+  border: 1px solid var(--accent-light);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.att-search svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.att-search input {
+  background: transparent;
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.att-search input::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.att-staff-count {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Table Container ── */
+.att-table-container {
+  flex: 1;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--accent-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.att-table-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 0 0 8px 0;
+}
+
+.att-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.att-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--accent-lighter);
+}
+
+.att-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px 16px 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.att-table thead th:first-child {
+  padding-left: 20px;
+}
+
+.att-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s;
+}
+
+.att-table tbody tr:hover {
+  background: var(--accent-lighter);
+}
+
+.att-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.att-table tbody td {
+  padding: 10px 16px;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+.att-table tbody td:first-child {
+  padding-left: 20px;
+}
+
+.att-empty {
+  text-align: center;
+  padding: 32px !important;
+  color: var(--text-muted);
+}
+
+/* ── Personnel Identity ── */
+.att-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.att-avatar,
+.att-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+.att-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.att-identity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.att-identity-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.att-identity-code {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* ── Time Cell ── */
+.att-time-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.att-time-cell:hover {
+  background: var(--accent-lighter);
+}
+
+.att-time-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.att-time-sub {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.att-time-cell.dirty .att-time-sub {
+  color: var(--accent);
+}
+
+.att-time-input {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  padding: 6px 8px;
+  outline: none;
+  background: var(--bg-white);
+}
+
+/* ── Mission Hours Pill ── */
+.att-hours-pill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+
+/* ── Status Badge ── */
+.att-status-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.att-status-badge:hover {
+  transform: scale(1.08);
+}
+
+.att-status-badge.present {
+  background: var(--green);
+}
+
+.att-status-badge.absent {
+  background: var(--text-primary);
+}
+
+.att-status-badge.leave {
+  background: #f59e0b;
+}
+
+.att-status-badge.dirty {
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.att-status-badge.static {
+  width: auto;
+  min-width: 30px;
+  height: 26px;
+  border-radius: 13px;
+  padding: 0 10px;
+  cursor: default;
+  font-size: 12px;
+}
+
+.att-status-badge.static:hover {
+  transform: none;
+}
+
+/* ── Weekly Grid ── */
+.att-weekly-table .att-day-col {
+  text-align: center;
+  padding: 10px 8px !important;
+}
+
+.att-day-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.att-day-num {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: none;
+}

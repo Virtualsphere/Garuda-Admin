@@ -1,0 +1,365 @@
+/* ── HR All Employees Layout ── */
+.hr-emp-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0 24px;
+}
+
+/* ── Header ── */
+.hr-emp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.hr-emp-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.hr-emp-icon {
+  color: var(--accent);
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+}
+
+.hr-emp-title-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hr-emp-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hr-emp-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hr-emp-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hr-emp-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 10px 16px;
+  min-width: 200px;
+}
+
+.hr-emp-search svg {
+  color: var(--text-muted);
+}
+
+.hr-emp-search input {
+  font-size: 12px;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.hr-emp-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.hr-emp-select {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.hr-emp-select svg {
+  color: var(--text-muted);
+}
+
+.hr-emp-filter-btn {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0 8px;
+  border-right: 1px solid var(--border);
+}
+
+.hr-emp-filter-btn:hover {
+  color: var(--text-primary);
+}
+
+.hr-emp-global-btn {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 24px;
+  border-radius: 24px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.hr-emp-global-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Table Container ── */
+.hr-emp-table-container {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  border-top: 4px solid var(--text-primary);
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1; /* Stretch to fill */
+}
+
+.hr-emp-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.hr-emp-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.hr-emp-table th,
+.hr-emp-table td {
+  padding: 16px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.hr-emp-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-white);
+  z-index: 2;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.hr-emp-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Table Cells */
+.hr-emp-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hr-emp-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.hr-emp-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hr-emp-name-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hr-emp-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hr-emp-id {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.hr-emp-bu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.hr-emp-bu svg {
+  color: var(--text-muted);
+}
+
+/* Badges */
+.hr-emp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.hr-emp-badge.leadership {
+  color: #f97316;
+  background: #fff7ed;
+}
+
+.hr-emp-badge.leadership svg {
+  color: #f97316;
+}
+
+.hr-emp-badge.lands-head {
+  color: #f97316;
+  background: #fff7ed;
+}
+
+.hr-emp-badge.lands-head svg {
+  color: #f97316;
+}
+
+.hr-emp-badge.team-leader {
+  color: #ffffff;
+  background: #14532d; /* Dark green */
+}
+
+.hr-emp-badge.team-leader svg {
+  color: #ffffff;
+}
+
+.hr-emp-badge.executive {
+  color: #ffffff;
+  background: #86efac; /* Light green */
+}
+
+.hr-emp-badge.executive svg {
+  color: #ffffff;
+}
+
+/* Environment */
+.hr-emp-env {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hr-emp-env.office {
+  color: #3b82f6;
+}
+
+.hr-emp-env.office svg {
+  color: #3b82f6;
+}
+
+.hr-emp-env.field {
+  color: #22c55e;
+}
+
+.hr-emp-env.field svg {
+  color: #22c55e;
+}
+
+/* Node */
+.hr-emp-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.hr-emp-node svg {
+  color: var(--text-muted);
+}
+
+/* Action */
+.hr-emp-action-btn {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.hr-emp-action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Native select for dept filter ── */
+.hr-emp-select-native {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 8px 16px;
+  font-size: 11px;
+  color: var(--text-primary);
+  cursor: pointer;
+  appearance: auto;
+  outline: none;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.hr-emp-select-native:focus {
+  border-color: var(--accent);
+}
+

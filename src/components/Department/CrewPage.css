@@ -1,0 +1,339 @@
+/* ── Crew Page ── */
+.crew-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 24px;
+}
+
+/* ── Crew Header ── */
+.crew-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.crew-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.crew-title-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crew-title-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pink);
+}
+
+.crew-title-main h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.crew-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 42px;
+}
+
+.crew-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-width: 200px;
+}
+
+.crew-search svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.crew-search input {
+  background: transparent;
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.crew-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Crew Table ── */
+.crew-table-container {
+  flex: 1;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--pink-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.crew-table-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0 8px 0;
+}
+
+.crew-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.crew-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-white);
+}
+
+.crew-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px 12px 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.crew-table thead th:first-child {
+  padding-left: 20px;
+}
+
+.crew-table thead th:last-child {
+  padding-right: 20px;
+  text-align: center;
+}
+
+.crew-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s;
+}
+
+.crew-table tbody tr:hover {
+  background: rgba(232, 67, 147, 0.02);
+}
+
+.crew-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.crew-table tbody td {
+  padding: 12px 12px;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+.crew-table tbody td:first-child {
+  padding-left: 20px;
+}
+
+.crew-table tbody td:last-child {
+  padding-right: 20px;
+  text-align: center;
+}
+
+/* ── Personnel Identity Cell ── */
+.personnel-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.personnel-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.personnel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.personnel-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.personnel-code {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── Cadre/Designation ── */
+.cadre-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.cadre-tag svg {
+  width: 10px;
+  height: 10px;
+}
+
+.cadre-tag.manager {
+  background: #e8eaf6;
+  color: #3b5bdb;
+}
+
+.cadre-tag.team-leader {
+  background: var(--pink);
+  color: #ffffff;
+}
+
+.cadre-tag.executive {
+  background: #fce4ec;
+  color: var(--pink);
+}
+
+/* ── Date Cell ── */
+.date-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.date-cell svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Node Cell ── */
+.node-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.node-cell svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Contact Cell ── */
+.contact-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.contact-cell svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Status Badge ── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.status-badge.trainee {
+  background: #e8f5e9;
+  color: #22c55e;
+}
+
+.status-badge.applied {
+  background: var(--blue-dark);
+  color: #ffffff;
+}
+
+.status-badge.active {
+  background: #e8f5e9;
+  color: #22c55e;
+}
+
+.status-badge.inactive {
+  background: #fce4ec;
+  color: var(--pink);
+}
+
+/* ── Audit Chevron ── */
+.audit-chevron {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+
+.audit-chevron:hover {
+  background: var(--bg-main);
+  color: var(--text-primary);
+}

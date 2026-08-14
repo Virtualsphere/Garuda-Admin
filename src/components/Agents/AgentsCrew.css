@@ -1,0 +1,214 @@
+/* ── Agents Crew Page Layout ── */
+.a-crew-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0 24px;
+}
+
+/* ── Header ── */
+.a-crew-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.a-crew-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.a-crew-icon {
+  color: #ef4444; /* Red icon as per design */
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+}
+
+.a-crew-title-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.a-crew-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.a-crew-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.a-crew-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 10px 16px;
+  min-width: 280px;
+}
+
+.a-crew-search svg {
+  color: var(--text-muted);
+}
+
+.a-crew-search input {
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.a-crew-search input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Table Container ── */
+.a-crew-section {
+  background: var(--bg-white);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--border-light);
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1; /* Stretch to fill */
+}
+
+.a-crew-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.a-crew-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.a-crew-table th,
+.a-crew-table td {
+  padding: 16px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.a-crew-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-white);
+  z-index: 2;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.a-crew-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Table Cells */
+.a-crew-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.a-crew-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.a-crew-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.a-crew-name-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.a-crew-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.a-crew-id {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.a-crew-designation {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.a-crew-designation.tl {
+  color: #c026d3; /* Purple */
+}
+
+.a-crew-designation.tl svg {
+  color: #c026d3;
+}
+
+.a-crew-designation.exec {
+  color: var(--text-primary);
+}
+
+.a-crew-designation.exec svg {
+  color: var(--text-muted);
+}
+
+.a-crew-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.a-crew-text svg {
+  color: var(--text-muted);
+}
+
+.a-crew-audit-btn {
+  color: var(--text-muted);
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a-crew-audit-btn:hover {
+  color: var(--text-primary);
+}
