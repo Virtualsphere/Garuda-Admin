@@ -151,7 +151,7 @@ export default function BuyerLinkBuyer() {
                 <div className="blb-assigned-list">
                   {assigned.map(buyer => (
                     <div key={buyer.id} className="blb-assigned-item">
-                      <div className="blb-assigned-avatar">{buyer.initial}</div>
+                      <div className="blb-assigned-avatar">{buyer.name?.charAt(0)?.toUpperCase() || '?'}</div>
                       <div className="blb-assigned-name">{buyer.name}</div>
                       <button
                         className="blb-unassign-btn"
@@ -193,12 +193,12 @@ export default function BuyerLinkBuyer() {
               if (!buyer) return null;
               return (
                 <div key={buyer.id} className="blb-pool-item">
-                  <div className="blb-pool-avatar">{buyer.initial}</div>
+                  <div className="blb-pool-avatar">{buyer.name?.charAt(0)?.toUpperCase() || '?'}</div>
                   <div className="blb-pool-info">
                     <div className="blb-pool-name">{buyer.name}</div>
                     <div className="blb-pool-code">
-                      <span className={`blb-code-badge ${buyer.code.startsWith('BUY') ? 'buy' : 'pl'}`}>
-                        {buyer.code.startsWith('BUY') ? '🟢' : '🟡'} ID: {buyer.code}
+                      <span className={`blb-code-badge ${buyer.buyer_code?.startsWith('BUY') ? 'buy' : 'pl'}`}>
+                        {buyer.buyer_code?.startsWith('BUY') ? '🟢' : '🟡'} ID: {buyer.buyer_code || '—'}
                       </span>
                     </div>
                   </div>

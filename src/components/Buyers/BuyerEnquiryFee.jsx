@@ -23,9 +23,11 @@ export default function BuyerEnquiryFee() {
   }, []);
 
   const rows = buyers.map((b) => {
-    // Determine paid status based on nested paymentBuyer
-    const hasPaid = b.paymentBuyer?.some(p => p.payment_status === 'paid' || p.payment_status === 'completed');
-    return { ...b, paid: hasPaid, locked: !hasPaid };
+    // Determine paid status and fee amount from nested paymentBuyer
+    const payments = b.paymentBuyer || [];
+    const hasPaid = payments.some(p => p.payment_status === 'paid');
+    const fee = payments.length ? payments[payments.length - 1].amount : null;
+    return { ...b, paid: hasPaid, locked: !hasPaid, fee };
   });
 
   return (
@@ -64,10 +66,10 @@ export default function BuyerEnquiryFee() {
               <tr key={row.id}>
                 <td>
                   <div className="bef-investor">
-                    <div className="bef-avatar">{row.name.charAt(0)}</div>
+                    <div className="bef-avatar">{row.name?.charAt(0) || '?'}</div>
                     <div className="bef-investor-info">
                       <span className="bef-investor-name">{row.name}</span>
-                      <span className="bef-investor-code">{row.code}</span>
+                      <span className="bef-investor-code">{row.buyer_code || '—'}</span>
                     </div>
                   </div>
                 </td>
@@ -77,16 +79,16 @@ export default function BuyerEnquiryFee() {
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
                     </svg>
                     <div>
-                      <div className="bef-cluster">{row.cluster}</div>
-                      <div className="bef-city">{row.city}</div>
+                      <div className="bef-cluster">{row.cluster || '—'}</div>
+                      <div className="bef-city">{row.city || '—'}</div>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <span className="bef-acreage">{row.acreage}</span>
+                  <span className="bef-acreage">{row.acreage || '—'}</span>
                 </td>
                 <td>
-                  <span className="bef-fee">₹{row.fee.toLocaleString('en-IN')}</span>
+                  <span className="bef-fee">{row.fee != null ? `₹${row.fee.toLocaleString('en-IN')}` : '—'}</span>
                 </td>
                 <td>
                   <div className="bef-status-badges">
