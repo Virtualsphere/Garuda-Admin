@@ -1,0 +1,380 @@
+/* ── Tactical map: village nodes + agent identity bubbles ── */
+
+.a-map-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 16px;
+  min-height: 0;
+}
+
+/* ── Summary strip ── */
+.a-map-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.a-map-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 16px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.a-map-stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.a-map-stat.alert .a-map-stat-value {
+  color: #dc2626;
+}
+
+.a-map-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+/* ── Map surface ── */
+.a-map-surface {
+  position: relative;
+  flex: 1;
+  min-height: 420px;
+  overflow: hidden;
+  background: var(--accent-lighter);
+  background-image:
+    linear-gradient(var(--border-light) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+  background-size: 40px 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl, 16px);
+  cursor: grab;
+  user-select: none;
+}
+
+.a-map-surface:active {
+  cursor: grabbing;
+}
+
+.a-map-canvas {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+}
+
+.a-map-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Village node ── */
+.a-map-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.a-map-node-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-white);
+  border: 2px solid var(--accent);
+  box-shadow: 0 2px 8px var(--accent-shadow);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.a-map-node-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.a-map-node-label {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 6px);
+  white-space: nowrap;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.a-map-node.selected .a-map-node-circle {
+  border-color: var(--accent-dark);
+  box-shadow: 0 0 0 4px var(--accent-shadow);
+}
+
+/* Vacant node — required force not yet allotted */
+.a-map-node.vacant .a-map-node-circle {
+  border-color: #dc2626;
+  border-style: dashed;
+  animation: a-map-pulse 1.8s ease-out infinite;
+}
+
+.a-map-node.vacant .a-map-node-count {
+  color: #dc2626;
+}
+
+@keyframes a-map-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
+  70%  { box-shadow: 0 0 0 14px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+/* ── Identity bubble ── */
+.a-map-bubble {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  overflow: visible;
+  background: var(--accent);
+  border: 2px solid var(--bg-white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  z-index: 2;
+}
+
+.a-map-bubble img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.a-map-bubble-initials {
+  font-size: 9px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+.a-map-bubble.home {
+  border-color: var(--accent-dark);
+}
+
+.a-map-bubble.match {
+  box-shadow: 0 0 0 3px var(--accent-shadow-lg);
+}
+
+/* Hover enlarges the avatar and reveals name + phone in place */
+.a-map-bubble:hover {
+  transform: scale(1.9);
+  z-index: 5;
+}
+
+.a-map-bubble-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%) scale(0.55);
+  transform-origin: bottom center;
+  display: none;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 10px;
+  white-space: nowrap;
+  background: var(--text-primary);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.a-map-bubble:hover .a-map-bubble-tip {
+  display: flex;
+}
+
+.a-map-bubble-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.a-map-bubble-phone {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Controls ── */
+.a-map-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+}
+
+.a-map-controls button {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.a-map-controls button:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.a-map-controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── Legend ── */
+.a-map-legend {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 10px 12px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+.a-map-legend-title {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.a-map-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 2px 0;
+}
+
+.a-map-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.a-map-legend-dot.occupied {
+  background: var(--bg-white);
+  border: 2px solid var(--accent);
+}
+
+.a-map-legend-dot.vacant {
+  background: var(--bg-white);
+  border: 2px dashed #dc2626;
+}
+
+.a-map-legend-dot.bubble {
+  background: var(--accent);
+  border: 2px solid var(--bg-white);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* ── Selected node detail card ── */
+.a-map-detail {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 260px;
+  padding: 14px 16px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.a-map-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.a-map-detail-village {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.a-map-detail-header button {
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.a-map-detail-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.a-map-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.a-map-detail-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.a-map-detail-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.a-map-detail-value.due {
+  color: #dc2626;
+}
+
+.a-map-detail-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}

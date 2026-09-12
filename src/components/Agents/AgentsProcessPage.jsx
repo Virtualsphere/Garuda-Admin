@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import agentService from '../../services/agentService';
 import landService from '../../services/landService';
 import useLocations from '../../hooks/useLocations';
+import AgentAllotmentMap from './AgentAllotmentMap';
 import './AgentsProcessPage.css';
 
 export default function AgentsProcessPage() {
   const [activeSubTab, setActiveSubTab] = useState('allotment');
+  const [missionView, setMissionView] = useState('registry');
 
   const {
     states, districts, mandals, villages,
@@ -70,6 +72,34 @@ export default function AgentsProcessPage() {
   }, [selectedAgentId]);
 
   const selectedAgent = agents.find((a) => String(a.id) === String(selectedAgentId));
+
+  // Selects hold location ids; the map endpoint filters on names.
+  const stateName = useMemo(
+    () => states.find((s) => String(s.id) === String(selectedState))?.name,
+    [states, selectedState]
+  );
+  const districtName = useMemo(
+    () => districts.find((d) => String(d.id) === String(selectedDistrict))?.name,
+    [districts, selectedDistrict]
+  );
+  const mandalName = useMemo(
+    () => mandals.find((m) => String(m.id) === String(selectedMandal))?.name,
+    [mandals, selectedMandal]
+  );
+  const villageName = useMemo(
+    () => villages.find((v) => String(v.id) === String(selectedVillage))?.name,
+    [villages, selectedVillage]
+  );
+
+  const refreshLinkedLands = useCallback(async () => {
+    if (!selectedAgentId) return;
+    try {
+      const data = await agentService.getLinkedLands(selectedAgentId);
+      setLinkedLands(data.data || []);
+    } catch (err) {
+      console.error('Failed to fetch linked lands:', err);
+    }
+  }, [selectedAgentId]);
 
   const missionsData = useMemo(() => {
     return lands
@@ -166,11 +196,17 @@ export default function AgentsProcessPage() {
                 MISSION REGISTRY POOL
               </div>
               <div className="a-mission-toggle">
-                <div className="a-mission-toggle-btn active">
+                <div
+                  className={`a-mission-toggle-btn${missionView === 'registry' ? ' active' : ''}`}
+                  onClick={() => setMissionView('registry')}
+                >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
                   REGISTRY
                 </div>
-                <div className="a-mission-toggle-btn">
+                <div
+                  className={`a-mission-toggle-btn${missionView === 'map' ? ' active' : ''}`}
+                  onClick={() => setMissionView('map')}
+                >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" /><line x1="8" y1="2" x2="8" y2="18" /><line x1="16" y1="6" x2="16" y2="22" /></svg>
                   TACTICAL MAP
                 </div>
@@ -200,6 +236,21 @@ export default function AgentsProcessPage() {
               </select>
             </div>
 
+            {missionView === 'map' && (
+              <div className="a-mission-map">
+                <AgentAllotmentMap
+                  agentId={selectedAgentId}
+                  agentName={selectedAgent?.name}
+                  state={stateName}
+                  district={districtName}
+                  mandal={mandalName}
+                  village={villageName}
+                  onChanged={refreshLinkedLands}
+                />
+              </div>
+            )}
+
+            {missionView === 'registry' && (
             <div className="a-mission-list">
               {landsLoading ? (
                 <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading missions...</div>
@@ -249,6 +300,7 @@ export default function AgentsProcessPage() {
                 </div>
               ))}
             </div>
+            )}
           </div>
 
           {/* Right Panel */}

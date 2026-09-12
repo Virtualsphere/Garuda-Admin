@@ -324,3 +324,102 @@
 .a-person-arrow {
   color: var(--text-muted);
 }
+
+/* ── Map slot inside the content panel ── */
+.a-content-map {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* ── Registry actions (enlist / edit / remove) ── */
+.a-main-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.a-enlist-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: var(--accent);
+  color: var(--bg-white);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.a-enlist-btn:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.a-enlist-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.a-action-error {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  color: var(--text-primary);
+  padding: 10px 13px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.a-person-card {
+  cursor: pointer;
+}
+
+.a-person-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.a-person-tools {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.a-person-card:hover .a-person-tools,
+.a-person-card:focus-within .a-person-tools {
+  opacity: 1;
+}
+
+.a-person-tool {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+}
+
+.a-person-tool:hover {
+  color: var(--accent-dark);
+  border-color: var(--accent-border);
+  background: var(--accent-lighter);
+}
+
+.a-person-tool:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.a-person-tool-danger:hover {
+  color: var(--red);
+  border-color: var(--red);
+  background: var(--bg-white);
+}

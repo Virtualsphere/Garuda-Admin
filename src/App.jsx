@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import LoginPage from './components/Auth/LoginPage';
 import Sidebar from './components/Sidebar/Sidebar';
+import TopBarActions from './components/Shell/TopBarActions';
 import SignalAuditHub from './components/SignalAuditHub/SignalAuditHub';
 import DepartmentPage from './components/Department/DepartmentPage';
 import InboundSignals from './components/InboundSignals/InboundSignals';
@@ -13,9 +14,7 @@ import LandWalletPage from './components/Land/LandWalletPage';
 import FarmersDepartmentPage from './components/Farmers/FarmersDepartmentPage';
 import FarmersCallsPage from './components/Farmers/FarmersCallsPage';
 import FarmersPage from './components/Farmers/FarmersPage';
-import AgentsDepartmentPage from './components/Agents/AgentsDepartmentPage';
-import AgentsPage from './components/Agents/AgentsPage';
-import AgentsProcessPage from './components/Agents/AgentsProcessPage';
+import AgentsModule from './components/Agents/AgentsModule';
 import HRPage from './components/HR/HRPage';
 import SettingsPage from './components/Settings/SettingsPage';
 import BuyersPage from './components/Buyers/BuyersPage';
@@ -54,11 +53,9 @@ const buyersTopTabs = [
 ];
 
 const agentsTopTabs = [
-  { key: 'agents', label: 'Agents', icon: 'user' },
-  { key: 'process', label: 'Process', icon: 'file' },
-  { key: 'department', label: 'Department', icon: 'grid' },
-  { key: 'calls', label: 'Calls', icon: 'phone' },
-  { key: 'dashboard', label: 'Dashboard', icon: 'chart' },
+  { key: 'recruitment', label: 'Recruitment', icon: 'users' },
+  { key: 'coordination', label: 'Coordination', icon: 'grid' },
+  { key: 'management', label: 'Management', icon: 'user' },
 ];
 
 const hrTopTabs = [
@@ -158,6 +155,14 @@ function TopTabIcon({ type }) {
           <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
         </svg>
       );
+    case 'headset':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 14v-3a9 9 0 0 1 18 0v3" />
+          <path d="M21 16a2 2 0 0 1-2 2h-1a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h3Z" />
+          <path d="M3 16a2 2 0 0 0 2 2h1a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H3Z" />
+        </svg>
+      );
     case 'board':
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -186,7 +191,7 @@ export default function App() {
   const [activeTabLand, setActiveTabLand] = useState('data');
   const [activeTabFarmers, setActiveTabFarmers] = useState('department');
   const [activeTabBuyers, setActiveTabBuyers] = useState('process');
-  const [activeTabAgents, setActiveTabAgents] = useState('process');
+  const [activeTabAgents, setActiveTabAgents] = useState('recruitment');
   const [activeTabHR, setActiveTabHR] = useState('allemployees');
   const [activeTabSettings, setActiveTabSettings] = useState('visiting');
 
@@ -256,6 +261,41 @@ export default function App() {
     }
   };
 
+  /**
+   * Quick-add takes the user to the page that owns the record and then asks it
+   * to open its own create form.
+   *
+   * The navigation and the event are deliberately separate: navigation always
+   * works, so the action is never a dead end, and a page that has not wired up
+   * the listener simply lands the user in the right place instead of silently
+   * doing nothing.
+   */
+  const handleQuickAdd = (type) => {
+    const routes = {
+      land: ['land', 'land-data'],
+      buyer: ['buyers', 'process'],
+      agent: ['agents', 'recruitment'],
+      farmer: ['farmers', 'farmers'],
+      visit: ['buyers', 'process'],
+    };
+
+    const route = routes[type];
+    if (!route) return;
+
+    const [section, tab] = route;
+    setActiveSection(section);
+    if (section === 'land') setActiveTabLand(tab);
+    else if (section === 'farmers') setActiveTabFarmers(tab);
+    else if (section === 'buyers') setActiveTabBuyers(tab);
+    else if (section === 'agents') setActiveTabAgents(tab);
+
+    // Let the destination open its create form once it has rendered.
+    window.setTimeout(
+      () => window.dispatchEvent(new CustomEvent('garuda:quick-add', { detail: { type } })),
+      0
+    );
+  };
+
   return (
     <div className="app-layout">
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
@@ -274,6 +314,8 @@ export default function App() {
               </button>
             ))}
           </div>
+          <TopBarActions onQuickAdd={handleQuickAdd} />
+
           <button className="main-fullscreen-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
@@ -335,14 +377,7 @@ export default function App() {
             <div style={{ padding: '24px', color: 'var(--text-muted)' }}>Section coming soon...</div>
           )}
           {activeSection === 'agents' && (
-            <>
-              {activeTab === 'department' && <AgentsDepartmentPage />}
-              {activeTab === 'agents' && <AgentsPage />}
-              {activeTab === 'process' && <AgentsProcessPage />}
-              {activeTab !== 'department' && activeTab !== 'agents' && activeTab !== 'process' && (
-                <div style={{ padding: '24px', color: 'var(--text-muted)' }}>Page coming soon...</div>
-              )}
-            </>
+            <AgentsModule activeTab={activeTab} />
           )}
           {activeSection === 'hr' && (
             <HRPage activeTab={activeTab} />

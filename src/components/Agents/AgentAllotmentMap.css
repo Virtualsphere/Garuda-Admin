@@ -1,0 +1,418 @@
+/* ── Allotment map: land nodes, mission targets, observation heatmap ── */
+
+.a-alot-map-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 12px;
+  min-height: 0;
+}
+
+.a-alot-map-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.a-alot-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.a-alot-stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.a-alot-stat.alert .a-alot-stat-value {
+  color: #dc2626;
+}
+
+.a-alot-stat-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+/* ── Portfolio wallet ── */
+.a-alot-wallet {
+  padding: 12px 16px;
+  background: var(--accent-lighter);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.a-alot-wallet-head {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  color: var(--accent-dark);
+}
+
+.a-alot-wallet-body {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.a-alot-wallet-body > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.a-alot-wallet-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.a-alot-wallet-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+/* ── Surface ── */
+.a-alot-surface {
+  position: relative;
+  flex: 1;
+  min-height: 380px;
+  overflow: hidden;
+  background: var(--accent-lighter);
+  background-image:
+    linear-gradient(var(--border-light) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+  background-size: 40px 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl, 16px);
+  cursor: grab;
+  user-select: none;
+}
+
+.a-alot-surface:active {
+  cursor: grabbing;
+}
+
+.a-alot-canvas {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+}
+
+.a-alot-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Land node ── */
+.a-alot-node {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.a-alot-node:hover {
+  transform: scale(1.5);
+  z-index: 4;
+}
+
+.a-alot-node.selected {
+  box-shadow: 0 0 0 3px var(--accent-shadow-lg);
+  z-index: 5;
+}
+
+/* Unlinked, outside any territory */
+.a-alot-node.free {
+  background: var(--bg-white);
+  border: 2px solid var(--border);
+}
+
+/* Held by a different agent */
+.a-alot-node.taken {
+  background: #94a3b8;
+  border: 2px solid var(--bg-white);
+}
+
+/* Linked to the selected agent */
+.a-alot-node.linked {
+  background: var(--accent);
+  border: 2px solid var(--bg-white);
+}
+
+/* In territory, unlinked — the recruitment/mission signal */
+.a-alot-node.target {
+  background: #fee2e2;
+  border: 2px solid #dc2626;
+  animation: a-alot-pulse 1.8s ease-out infinite;
+}
+
+@keyframes a-alot-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
+  70%  { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+/* Observation tone: deeper blue → violet with each extra observer.
+   Applied to nodes that are not already carrying a stronger signal. */
+.a-alot-node.free.tone-1,
+.a-alot-node.taken.tone-1 {
+  background: #93c5fd;
+  border-color: #60a5fa;
+}
+
+.a-alot-node.free.tone-2,
+.a-alot-node.taken.tone-2 {
+  background: #6366f1;
+  border-color: #4f46e5;
+}
+
+.a-alot-node.free.tone-3,
+.a-alot-node.taken.tone-3 {
+  background: #7c3aed;
+  border-color: #6d28d9;
+}
+
+.a-alot-node-obs {
+  position: absolute;
+  right: -5px;
+  top: -6px;
+  min-width: 12px;
+  height: 12px;
+  padding: 0 2px;
+  border-radius: 6px;
+  background: var(--text-primary);
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 12px;
+  text-align: center;
+}
+
+/* ── Controls ── */
+.a-alot-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+}
+
+.a-alot-controls button {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.a-alot-controls button:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.a-alot-controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── Legend ── */
+.a-alot-legend {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 10px 12px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+.a-alot-legend-title {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.a-alot-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 2px 0;
+}
+
+.a-alot-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.a-alot-legend-dot.target {
+  background: #fee2e2;
+  border: 2px solid #dc2626;
+}
+
+.a-alot-legend-dot.linked {
+  background: var(--accent);
+}
+
+.a-alot-legend-dot.taken {
+  background: #94a3b8;
+}
+
+.a-alot-legend-ramp {
+  width: 44px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #ffffff, #93c5fd, #6366f1, #7c3aed);
+  border: 1px solid var(--border);
+}
+
+/* ── Detail card ── */
+.a-alot-detail {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 280px;
+  padding: 14px 16px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.a-alot-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.a-alot-detail-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.a-alot-detail-header button {
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.a-alot-detail-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.a-alot-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.a-alot-detail-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.a-alot-detail-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.a-alot-detail-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.a-alot-detail-owner {
+  margin-top: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.a-alot-detail-hint {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.a-alot-detail-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.a-alot-action {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--text-secondary);
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.a-alot-action.primary {
+  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.a-alot-action:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

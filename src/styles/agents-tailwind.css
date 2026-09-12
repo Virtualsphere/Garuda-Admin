@@ -1,0 +1,142 @@
+/**
+ * Tailwind, scoped to the Agents section.
+ *
+ * The rest of this app is styled with the per-section CSS variables described
+ * in CLAUDE.md; the Agents section is a deliberate exception, rebuilt to match
+ * the Garuda Firebase design verbatim. Two things make that cohabitation work:
+ *
+ * 1. Utilities are imported UNLAYERED. index.css is unlayered too, and its
+ *    `button { border: none; background: none }` / `input { border: none }`
+ *    element rules would otherwise beat any layered utility in the cascade
+ *    (unlayered always wins over layered). Unlayered, a single-class utility
+ *    (0,1,0) outranks an element selector (0,0,1), which is what we want.
+ *
+ * 2. Preflight is NOT imported. It is a global reset and would restyle every
+ *    other section of the app. index.css already does preflight's important
+ *    work anyway (`* { margin: 0; padding: 0; box-sizing: border-box }`,
+ *    `ul, ol { list-style: none }`, the button/input resets), so the only
+ *    piece worth restoring is the border default, done below.
+ */
+
+@layer theme;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css";
+
+/* Only the Agents tree uses Tailwind, so only it needs scanning. */
+/* Only these trees use Tailwind, so only they need scanning. The shell tree
+   holds the app-wide overlays (call, quick add, live popups) that are built to
+   the same design but mount outside the Agents section. */
+@source "../components/Agents";
+@source "../components/Shell";
+
+@theme {
+  /**
+   * index.css sets `html { font-size: 14px }`, so Tailwind's rem-based scale
+   * would render this section ~12% smaller than the Firebase original. Pinning
+   * the scale in px makes the two match pixel-for-pixel regardless of the root
+   * font size.
+   */
+  --spacing: 4px;
+
+  --text-\[10px\]: 10px;
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-lg: 18px;
+  --text-lg--line-height: 28px;
+  --text-xl: 20px;
+  --text-xl--line-height: 28px;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 32px;
+  --text-3xl: 30px;
+  --text-3xl--line-height: 36px;
+  --text-4xl: 36px;
+  --text-4xl--line-height: 40px;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+
+  /**
+   * The Garuda palette. The prototype is built on Tailwind's `stone` ramp with
+   * a single blue accent, so these are the only custom colours needed.
+   */
+  --color-garuda-blue: #2563eb;
+  --color-garuda-blue-tint: #eff6ff;
+  --color-garuda-line: var(--color-stone-200);
+  --color-garuda-surface: var(--color-stone-50);
+  --color-garuda-canvas: var(--color-stone-100);
+}
+
+/**
+ * The slice of Tailwind's preflight the Agents tree genuinely needs. Without
+ * it `border` sets a width against `border-style: none` and draws nothing.
+ * Scoped to .garuda-agents so no other section is touched.
+ */
+.garuda-agents *,
+.garuda-agents *::before,
+.garuda-agents *::after,
+.garuda-ui *,
+.garuda-ui *::before,
+.garuda-ui *::after {
+  border-width: 0;
+  border-style: solid;
+  border-color: var(--color-garuda-line);
+}
+
+.garuda-ui {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--color-stone-900);
+}
+
+.garuda-agents {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--color-stone-900);
+  /* The section scrolls internally; the app shell owns the viewport. */
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* index.css hides the outline on every input; restore focus visibility here. */
+.garuda-ui input:focus-visible,
+.garuda-ui select:focus-visible,
+.garuda-ui textarea:focus-visible,
+.garuda-ui button:focus-visible,
+.garuda-agents input:focus-visible,
+.garuda-agents select:focus-visible,
+.garuda-agents textarea:focus-visible,
+.garuda-agents button:focus-visible {
+  outline: 2px solid var(--color-garuda-blue);
+  outline-offset: 1px;
+}
+
+.garuda-ui select,
+.garuda-agents select {
+  cursor: pointer;
+}
+
+/* ── Leaflet surface ─────────────────────────────────────────────── */
+
+/* The divIcon markers below are positioned wrappers, not boxes. */
+.garuda-agents .leaflet-div-icon,
+.custom-village-recruitment-pin,
+.custom-land-pin {
+  background: transparent;
+  border: none;
+}
+
+/* Leaflet paints its own grey ground; match the section canvas instead. */
+.garuda-agents .leaflet-container {
+  background: var(--color-garuda-canvas);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.garuda-agents .leaflet-container a {
+  color: var(--color-garuda-blue);
+}

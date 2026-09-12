@@ -123,6 +123,19 @@ const buyerService = {
       return { data: [] };
     }
   },
+
+  /**
+   * Create a buyer from the admin desk. Self-signup needs a password the buyer
+   * chooses; this generates one and never returns it, so the row exists to work
+   * against without handing anybody a login.
+   *
+   * Rejects with 409 when the phone or email already belongs to a buyer — the
+   * error is deliberately not swallowed, because the desk needs to see it.
+   */
+  async createFromDesk(payload) {
+    const { data } = await apiClient.post('/buyer', payload);
+    return data;
+  },
 };
 
 export default buyerService;

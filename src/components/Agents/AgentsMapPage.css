@@ -1,0 +1,145 @@
+/* ── Agents Map Page ── */
+.amp-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 24px 24px;
+  gap: 16px;
+}
+
+/* ── Header ── */
+.amp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.amp-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.amp-icon {
+  color: var(--accent);
+  width: 26px;
+  height: 26px;
+  margin-top: 2px;
+  flex: none;
+}
+
+.amp-title-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.amp-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.amp-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Controls ── */
+.amp-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.amp-select {
+  padding: 8px 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg-white);
+  min-width: 130px;
+}
+
+.amp-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-shadow);
+}
+
+.amp-select:disabled {
+  background: var(--bg-main);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.amp-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 11px;
+  min-width: 180px;
+}
+
+.amp-search svg { color: var(--text-muted); flex: none; }
+
+.amp-search input {
+  border: none;
+  outline: none;
+  background: none;
+  padding: 8px 0;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.amp-search input::placeholder { color: var(--text-muted); }
+.amp-search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-shadow); }
+
+.amp-clear {
+  padding: 8px 13px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.amp-clear:hover { color: var(--text-primary); border-color: var(--text-muted); }
+.amp-clear:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── Map surface ── */
+.amp-surface {
+  flex: 1;
+  min-height: 420px;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.amp-surface > * { flex: 1; min-height: 0; }

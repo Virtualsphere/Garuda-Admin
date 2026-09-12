@@ -502,3 +502,13 @@
   font-weight: 700;
   text-transform: uppercase;
 }
+
+/* ── Map slot inside the mission panel ── */
+.a-mission-map {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 16px;
+  overflow: hidden;
+}

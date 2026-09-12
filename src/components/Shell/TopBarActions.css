@@ -1,0 +1,342 @@
+/* Shell chrome in the main top bar. Everything themeable reads the section
+   variables so the bar re-colours with the active section, per the project's
+   theming rule. */
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Quick add ─────────────────────────────────────────────── */
+
+.topbar-quickadd {
+  position: relative;
+}
+
+.topbar-quickadd-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 24px;
+  background: var(--accent-gradient);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--accent-shadow);
+  transition: filter 0.2s ease;
+}
+
+.topbar-quickadd-btn:hover {
+  filter: brightness(1.06);
+}
+
+.topbar-quickadd-btn svg:first-child {
+  transition: transform 0.2s ease;
+}
+
+.topbar-quickadd-btn:hover svg:first-child {
+  transform: rotate(90deg);
+}
+
+/* ── Menus ─────────────────────────────────────────────────── */
+
+.topbar-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 200px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 14%);
+  padding: 6px;
+  z-index: 400;
+}
+
+.topbar-menu--wide {
+  min-width: 260px;
+}
+
+.topbar-menu-head {
+  padding: 4px 8px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.topbar-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background 0.15s ease;
+}
+
+.topbar-menu-item:hover {
+  background: var(--bg-main);
+}
+
+.topbar-menu-item.is-separated {
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  padding-top: 10px;
+}
+
+.topbar-menu-item.is-plain {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.topbar-menu-item.is-danger {
+  color: #b91c1c;
+}
+
+.topbar-menu-item.is-danger:hover {
+  background: #fef2f2;
+}
+
+.topbar-menu-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.topbar-menu-icon.tone-emerald { background: #d1fae5; color: #047857; }
+.topbar-menu-icon.tone-blue    { background: #dbeafe; color: #1d4ed8; }
+.topbar-menu-icon.tone-indigo  { background: #e0e7ff; color: #4338ca; }
+.topbar-menu-icon.tone-amber   { background: #fef3c7; color: #b45309; }
+.topbar-menu-icon.tone-rose    { background: #ffe4e6; color: #be123c; }
+
+.topbar-menu-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar-menu-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.topbar-menu-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ── Headcount ─────────────────────────────────────────────── */
+
+.topbar-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.topbar-count svg {
+  color: #059669;
+}
+
+.topbar-count strong {
+  color: var(--text-primary);
+}
+
+/* ── Duty switch ───────────────────────────────────────────── */
+
+.topbar-duty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+}
+
+.topbar-duty-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #a8a29e;
+  flex-shrink: 0;
+}
+
+.topbar-duty.is-online .topbar-duty-dot {
+  background: #10b981;
+  animation: topbar-pulse 2s ease-in-out infinite;
+}
+
+@keyframes topbar-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar-duty.is-online .topbar-duty-dot { animation: none; }
+  .topbar-quickadd-btn:hover svg:first-child { transform: none; }
+}
+
+.topbar-duty-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.topbar-duty-text strong {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.topbar-duty-text span {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+.topbar-switch {
+  width: 34px;
+  height: 18px;
+  border-radius: 999px;
+  background: #d6d3d1;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.topbar-switch:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.topbar-duty.is-online .topbar-switch {
+  background: #059669;
+}
+
+.topbar-switch-knob {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s ease;
+}
+
+.topbar-duty.is-online .topbar-switch-knob {
+  transform: translateX(16px);
+}
+
+/* ── Profile ───────────────────────────────────────────────── */
+
+.topbar-profile {
+  position: relative;
+}
+
+.topbar-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 24px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-primary);
+  transition: border-color 0.2s ease;
+}
+
+.topbar-profile-btn:hover {
+  border-color: var(--accent);
+}
+
+.topbar-avatar {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.topbar-avatar-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #a8a29e;
+  border: 2px solid var(--bg-white);
+}
+
+.topbar-avatar-dot.is-online {
+  background: #10b981;
+}
+
+.topbar-profile-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: left;
+}
+
+.topbar-profile-text strong {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-profile-text span {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+/* Narrow screens: keep the actions usable, drop the wordier bits. */
+@media (max-width: 1100px) {
+  .topbar-count,
+  .topbar-duty-text,
+  .topbar-profile-text {
+    display: none;
+  }
+}

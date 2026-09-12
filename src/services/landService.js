@@ -66,6 +66,21 @@ const landService = {
     const { data } = await apiClient.get(`/land/pending-physical-verification/${status}`);
     return data;
   },
+
+  /**
+   * Set (or change) the agent officially linked to a land. Passing `null`
+   * unlinks it, which is how a land is returned to the unassigned pool.
+   */
+  async linkToAgent(landId, agentId) {
+    const { data } = await apiClient.put(`/land/link-agent/${landId}`, { agentId });
+    return data;
+  },
+
+  /** Every land officially linked to one agent. */
+  async getByAgent(agentId) {
+    const { data } = await apiClient.get(`/land/by-agent/${agentId}`);
+    return data;
+  },
 };
 
 export default landService;

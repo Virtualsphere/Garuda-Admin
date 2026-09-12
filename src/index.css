@@ -117,22 +117,22 @@
    THEME: Agents (Slate/Indigo)
    ═══════════════════════════════════════ */
 [data-theme="agents"] {
-  --accent: #475569;
-  --accent-dark: #334155;
-  --accent-light: #f1f5f9;
-  --accent-lighter: #f8fafc;
-  --accent-border: #cbd5e1;
-  --accent-gradient: linear-gradient(135deg, #475569, #64748b);
-  --accent-shadow: rgba(71, 85, 105, 0.25);
-  --accent-shadow-lg: rgba(71, 85, 105, 0.4);
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
+  --accent-light: #dbeafe;
+  --accent-lighter: #eff6ff;
+  --accent-border: #bfdbfe;
+  --accent-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+  --accent-shadow: rgba(37, 99, 235, 0.25);
+  --accent-shadow-lg: rgba(37, 99, 235, 0.4);
 
   /* Sidebar */
   --sidebar-bg: #ffffff;
   --sidebar-width: 200px;
   --sidebar-text: #6b7280;
   --sidebar-text-hover: #1a1a2e;
-  --sidebar-active: #475569;
-  --sidebar-active-bg: rgba(71, 85, 105, 0.08);
+  --sidebar-active: #2563eb;
+  --sidebar-active-bg: rgba(37, 99, 235, 0.08);
   --sidebar-icon: #9ca3af;
   --sidebar-logo-text: #1a1a2e;
   --sidebar-border: #e5e7eb;
