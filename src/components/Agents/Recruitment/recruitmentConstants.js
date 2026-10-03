@@ -86,3 +86,51 @@ export const nextStage = (current) => {
   if (idx === -1 || idx === PIPELINE_STAGES.length - 1) return null;
   return PIPELINE_STAGES[idx + 1];
 };
+
+/**
+ * The regions the desk has a regional office in. The Interested tab filters and
+ * tallies by these, matching on the booked office's name — so "Sangareddy
+ * Regional Office" and "Sangareddy RO" both count towards Sangareddy.
+ */
+export const REGIONAL_OFFICE_REGIONS = [
+  'Mancherial',
+  'Adilabad',
+  'Nizamabad',
+  'Karimnagar',
+  'Siddipet',
+  'Hanamkonda',
+  'Khammam',
+  'Hyderabad',
+  'Nalgonda',
+  'Kalwakurthy',
+  'Jadcherla',
+  'Sangareddy',
+  'Vikarabad',
+  'Medak',
+  'Kamareddy',
+  'Mahabubnagar',
+  'Nagarkurnool',
+  'Wanaparthy',
+  'Gadwal',
+  'Suryapet',
+  'Miryalaguda',
+];
+
+/**
+ * Offices a candidate can be booked in to — one per region above, so the
+ * booking list and the Interested tab's office filter can never disagree.
+ */
+export const REGIONAL_OFFICES = [...REGIONAL_OFFICE_REGIONS]
+  .sort((a, b) => a.localeCompare(b))
+  .map((region) => `${region} Regional Office`);
+
+export const DEFAULT_REGIONAL_OFFICE = 'Sangareddy Regional Office';
+
+export const VISIT_TIME_SLOTS = [
+  '10:00 AM',
+  '11:00 AM',
+  '12:00 PM',
+  '2:00 PM',
+  '3:00 PM',
+  '4:00 PM',
+];

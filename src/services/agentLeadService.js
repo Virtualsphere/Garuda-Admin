@@ -129,6 +129,66 @@ const agentLeadService = {
     const { data } = await apiClient.put(`/agent-lead/office-visit/${id}/status`, payload);
     return data;
   },
+
+  // ── Interested ───────────────────────────────────────────────
+  /**
+   * Candidates past the call, joined server-side with who closed them, the
+   * recording, any team-leader involvement and the booked office. Rejects with a
+   * plain 404 on a backend that predates it — callers fall back to `getLeads`.
+   */
+  async getInterested() {
+    const { data } = await apiClient.get('/agent-lead/interested');
+    return data;
+  },
+
+  // ── Recovery hub (Not Lifted & Invalid) ──────────────────────
+  /** Leads the desk dialled and could not reach, with their WhatsApp trail. */
+  async getRecoveryLeads() {
+    const { data } = await apiClient.get('/agent-lead', {
+      params: { pool: 'recovery', includeWhatsapp: true },
+    });
+    return data;
+  },
+
+  /** The dumped archive. */
+  async getDumpedLeads() {
+    const { data } = await apiClient.get('/agent-lead', { params: { pool: 'dumped' } });
+    return data;
+  },
+
+  /** Correct a phone number; the lead stays where it is until a call connects. */
+  async updatePhone(id, phone, note) {
+    const { data } = await apiClient.put(`/agent-lead/${id}/phone`, { phone, note });
+    return data;
+  },
+
+  /** Retire an unreachable lead. `callerEmployeeId` credits a shared-desk colleague. */
+  async dump(id, { reason, callerEmployeeId } = {}) {
+    const { data } = await apiClient.post(`/agent-lead/${id}/dump`, { reason, callerEmployeeId });
+    return data;
+  },
+
+  async restore(id) {
+    const { data } = await apiClient.post(`/agent-lead/${id}/restore`);
+    return data;
+  },
+
+  /** Log a WhatsApp message that has just been opened in the browser. */
+  async logWhatsapp(id, { templateName, messageText, callerEmployeeId }) {
+    const { data } = await apiClient.post(`/agent-lead/${id}/whatsapp`, {
+      templateName,
+      messageText,
+      callerEmployeeId,
+    });
+    return data;
+  },
+
+  // ── Reports ──────────────────────────────────────────────────
+  /** Per-employee working numbers plus daily / weekly / monthly cadence. */
+  async getReport(params = {}) {
+    const { data } = await apiClient.get('/agent-lead/report', { params });
+    return data;
+  },
 };
 
 export default agentLeadService;

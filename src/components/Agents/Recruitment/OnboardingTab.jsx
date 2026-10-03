@@ -2,96 +2,123 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Loader2,
   AlertTriangle,
-  RefreshCw,
-  Building2,
-  CheckCircle2,
-  XCircle,
-  Phone,
-  UserPlus,
   MapPin,
-  Users,
   Table as TableIcon,
   Map as MapIcon,
-  Search,
-  CalendarDays,
-  PlayCircle,
 } from 'lucide-react';
 
-import ScheduleVisitModal from './ScheduleVisitModal';
 import OnboardingWizard from './OnboardingWizard';
-import PersonAvatar from '../common/PersonAvatar';
+import ScheduleVisitModal from './ScheduleVisitModal';
 import InteractiveMap from '../maps/InteractiveMap';
+import { useRecruitmentDesk } from '../../../hooks/useRecruitmentDesk';
 import useVillageLocations from '../../../hooks/useVillageLocations';
 import { getProgressMap } from './onboardingProgress';
 import agentLeadService from '../../../services/agentLeadService';
+import agentService from '../../../services/agentService';
+import { errorMessage } from '../../../utils/apiErrors';
+import { localDate } from './recruitmentModel';
 
-const GROUPINGS = [
-  { key: 'village', label: 'Village-wise', icon: MapPin },
-  { key: 'agent', label: 'Agent-wise', icon: Users },
-];
-
-const STATUS_TONES = {
-  Scheduled: 'bg-blue-50 text-[#2563EB] border-blue-200',
-  Completed: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-  Cancelled: 'bg-stone-100 text-stone-600 border-stone-300',
-};
-
-const todayISO = () => new Date().toISOString().slice(0, 10);
 const norm = (v) => String(v || '').trim().toLowerCase();
 
-const prettyDate = (iso) => {
-  if (!iso) return '—';
-  const dt = new Date(`${iso}T00:00:00`);
-  if (Number.isNaN(dt.getTime())) return iso;
-  if (iso === todayISO()) return 'Today';
-  return dt.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' });
+const initialsOf = (name) =>
+  String(name || '?')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase();
+
+/** A candidate's photo as a rounded square, falling back to initials. */
+function CandidatePhoto({ name, photo, className }) {
+  const [failed, setFailed] = useState(false);
+  if (photo && !failed) {
+    return (
+      <img
+        src={photo}
+        alt={name}
+        referrerPolicy="no-referrer"
+        onError={() => setFailed(true)}
+        className={`rounded-lg object-cover border border-stone-200 shadow-2xs shrink-0 ${className}`}
+      />
+    );
+  }
+  return (
+    <div
+      className={`rounded-lg border border-stone-200 bg-blue-50 text-[#2563EB] text-[11px] font-bold flex items-center justify-center shadow-2xs shrink-0 ${className}`}
+    >
+      {initialsOf(name)}
+    </div>
+  );
+}
+
+/**
+ * One office visit, in the shape the tables read. Cancelled visits are not part
+ * of the worklist (a cancelled booking sends the candidate back to Interested),
+ * and neither is anyone already appointed.
+ */
+const toVisit = (row) => {
+  const candidate = row.candidate || {};
+  return {
+    id: row.id,
+    raw: row,
+    candidate,
+    candidateId: candidate.id ?? row.candidate_id,
+    candidateName: candidate.name || 'Unknown lead',
+    phone: candidate.phone || '',
+    photo: candidate.photo || '',
+    nativeVillage: candidate.village || '',
+    interestedVillage: row.interested_village || candidate.village || '',
+    visitDate: row.visit_date || '',
+    visitTime: row.visit_time || '',
+    regionalOffice: row.regional_office || '',
+    status: row.status,
+  };
 };
 
 /**
  * The onboarding desk: candidates booked in to a regional office, and the
  * wizard that turns them into agents.
  *
- * Village-wise is the default because the seat, not the person, is the scarce
- * thing — the desk needs to see two candidates booked against one open slot
- * before it walks either of them through an agreement.
+ * Village-wise groups the schedule by the seat being competed for, so the desk
+ * sees two candidates booked against one open slot before walking either of them
+ * through an agreement; Agent-wise is the flat list. The map shows the same
+ * schedule geographically, with a drawer for whichever village is clicked.
  *
- * Marking a visit Cancelled drops the candidate back into Interested so they
- * reappear in that queue rather than disappearing — the server does that, and
- * this tab relies on it.
+ * "Resume" appears on a row once the wizard has been opened for that candidate:
+ * progress is a browser-local draft (see onboardingProgress.js), because nothing
+ * reaches the server until the final Complete Attachment.
  */
 export default function OnboardingTab({ refresh }) {
-  const [visits, setVisits] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [scope, setScope] = useState('all');
-  const [grouping, setGrouping] = useState('village');
-  const [view, setView] = useState('list');
-  const [office, setOffice] = useState('all');
-  const [query, setQuery] = useState('');
-  const [busyId, setBusyId] = useState(null);
-  const [rescheduling, setRescheduling] = useState(null);
-  const [onboarding, setOnboarding] = useState(null);
-  const [progress, setProgress] = useState({});
-
+  const { version } = useRecruitmentDesk();
   const { villages } = useVillageLocations({});
 
-  const vacancyOf = useCallback(
-    (name) => villages.find((v) => norm(v.name) === norm(name))?.vacancy,
-    [villages]
-  );
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [onboardingSubTab, setOnboardingSubTab] = useState('all');
+  const [onboardingViewMode, setOnboardingViewMode] = useState('list');
+  const [onboardingGroupBy, setOnboardingGroupBy] = useState('agent');
+  const [onboardingOfficeFilter, setOnboardingOfficeFilter] = useState('All');
+  const [selectedVillage, setSelectedVillage] = useState(null);
+
+  const [onboarding, setOnboarding] = useState(null);
+  const [rescheduling, setRescheduling] = useState(null);
+  const [progress, setProgress] = useState({});
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const data = await agentLeadService.getOfficeVisits({});
       const list = data.result || data.data || [];
-      setVisits(Array.isArray(list) ? list : []);
+      setRows(Array.isArray(list) ? list : []);
       setProgress(getProgressMap());
       setError(null);
     } catch (err) {
       console.error('Failed to load office visits:', err);
-      setVisits([]);
-      setError('Could not load the onboarding schedule.');
+      setRows([]);
+      setError(errorMessage(err, 'Could not load the onboarding schedule.'));
     } finally {
       setLoading(false);
     }
@@ -99,404 +126,457 @@ export default function OnboardingTab({ refresh }) {
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [load, version]);
 
-  const handleStatus = async (visit, status) => {
-    setBusyId(visit.id);
-    setError(null);
-    try {
-      await agentLeadService.updateOfficeVisitStatus(visit.id, { status });
-      await load();
-      refresh?.();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Could not update this visit.');
-    } finally {
-      setBusyId(null);
-    }
-  };
+  const todayStr = localDate();
+
+  // One live visit per candidate: a booked one wins over an attended one.
+  const visits = useMemo(() => {
+    const best = new Map();
+    rows
+      .filter((r) => r.status !== 'Cancelled')
+      .map(toVisit)
+      .filter((v) => v.candidate.status !== 'JOINED' && !v.candidate.converted_agent_id)
+      .forEach((v) => {
+        const key = String(v.candidateId);
+        const current = best.get(key);
+        if (!current || (current.status !== 'Scheduled' && v.status === 'Scheduled')) {
+          best.set(key, v);
+        }
+      });
+    return [...best.values()];
+  }, [rows]);
 
   const offices = useMemo(
-    () => [...new Set(visits.map((v) => v.regional_office).filter(Boolean))].sort(),
+    () => [...new Set(visits.map((v) => v.regionalOffice).filter(Boolean))].sort(),
     [visits]
   );
 
-  // Scope counts come from the unfiltered set so the pills read as totals.
-  const counts = useMemo(() => {
-    const stamp = todayISO();
-    return {
-      all: visits.length,
-      today: visits.filter((v) => v.visit_date === stamp).length,
-      upcoming: visits.filter((v) => v.visit_date > stamp && v.status === 'Scheduled').length,
-    };
-  }, [visits]);
+  const filteredVisits = useMemo(
+    () =>
+      visits.filter((visit) => {
+        if (onboardingOfficeFilter !== 'All' && visit.regionalOffice !== onboardingOfficeFilter)
+          return false;
+        if (onboardingSubTab === 'today' && visit.visitDate !== todayStr) return false;
+        if (onboardingSubTab === 'upcoming' && visit.visitDate <= todayStr) return false;
+        return true;
+      }),
+    [visits, onboardingOfficeFilter, onboardingSubTab, todayStr]
+  );
 
-  const filtered = useMemo(() => {
-    const stamp = todayISO();
-    const q = query.trim().toLowerCase();
+  const vacancyOf = useCallback(
+    (name) => villages.find((v) => norm(v.name) === norm(name)),
+    [villages]
+  );
 
-    return visits.filter((visit) => {
-      if (scope === 'today' && visit.visit_date !== stamp) return false;
-      if (scope === 'upcoming' && !(visit.visit_date > stamp && visit.status === 'Scheduled'))
-        return false;
-      if (office !== 'all' && visit.regional_office !== office) return false;
-
-      if (!q) return true;
-      const lead = visit.candidate || {};
-      return (
-        String(lead.name || '').toLowerCase().includes(q) ||
-        String(lead.phone || '').includes(q) ||
-        String(visit.interested_village || lead.village || '').toLowerCase().includes(q)
-      );
-    });
-  }, [visits, scope, office, query]);
-
-  const villageOf = (visit) =>
-    visit.interested_village || visit.candidate?.village || 'Unassigned village';
-
-  // Village-wise groups by the seat being competed for; agent-wise is flat.
-  const groups = useMemo(() => {
-    if (grouping === 'agent') return [['All candidates', filtered]];
+  const villageWiseVisits = useMemo(() => {
     const map = new Map();
-    filtered.forEach((visit) => {
-      const key = villageOf(visit);
-      if (!map.has(key)) map.set(key, []);
-      map.get(key).push(visit);
+    filteredVisits.forEach((visit) => {
+      const name = visit.interestedVillage || visit.nativeVillage || 'Unassigned village';
+      if (!map.has(name)) map.set(name, []);
+      map.get(name).push(visit);
     });
-    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [filtered, grouping]);
+
+    return [...map.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([villageName, list]) => {
+        const village = vacancyOf(villageName);
+        return {
+          villageName,
+          mandal: village?.mandal || '',
+          district: village?.district || '',
+          requiredAgents: village?.requiredAgents || 0,
+          attachedAgentsCount: village?.attachedAgentsCount || 0,
+          vacancy: village?.vacancy || 0,
+          // Interest counts the whole pipeline, not only the booked visits.
+          interestedCount: Math.max(village?.interestedAgentsCount || 0, list.length),
+          visits: list,
+        };
+      });
+  }, [filteredVisits, vacancyOf]);
+
+  const stepOf = (visit) => progress[String(visit.candidateId)] || 0;
 
   const openWizard = (visit) => {
-    // The office-visit endpoint does not include the candidate's own visits,
-    // so hand the wizard the one that brought them in.
-    setOnboarding({ ...(visit.candidate || {}), officeVisits: [visit] });
+    // The visit that brought them in rides along: the office-visit endpoint
+    // carries the candidate, not the candidate's other visits.
+    setOnboarding({ ...visit.candidate, officeVisits: [visit.raw] });
   };
+
+  const candidatePins = useMemo(
+    () =>
+      filteredVisits
+        .map((visit) => {
+          const village = vacancyOf(visit.interestedVillage);
+          if (!village?.centerCoordinates?.lat) return null;
+          return {
+            id: visit.id,
+            name: visit.candidateName,
+            village: village.name,
+            coordinates: village.centerCoordinates,
+          };
+        })
+        .filter(Boolean),
+    [filteredVisits, vacancyOf]
+  );
 
   return (
     <div className="space-y-3">
       {/* Controls */}
-      <div className="bg-white border border-stone-200 rounded-lg p-2.5 flex flex-wrap items-center gap-2">
-        <div className="inline-flex rounded-lg border border-stone-200 p-0.5 bg-stone-100">
-          {GROUPINGS.map((g) => {
-            const Icon = g.icon;
-            return (
-              <button
-                key={g.key}
-                type="button"
-                onClick={() => setGrouping(g.key)}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 ${
-                  grouping === g.key ? 'bg-white text-[#2563EB] shadow-2xs' : 'text-stone-600'
-                }`}
-              >
-                <Icon className="w-3 h-3" />
-                {g.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="inline-flex rounded-lg border border-stone-200 p-0.5 bg-stone-100">
-          <button
-            type="button"
-            onClick={() => setView('list')}
-            className={`px-2.5 py-1 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 ${
-              view === 'list' ? 'bg-white text-[#2563EB] shadow-2xs' : 'text-stone-600'
-            }`}
-          >
-            <TableIcon className="w-3 h-3" /> List
-          </button>
-          <button
-            type="button"
-            onClick={() => setView('map')}
-            className={`px-2.5 py-1 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 ${
-              view === 'map' ? 'bg-white text-[#2563EB] shadow-2xs' : 'text-stone-600'
-            }`}
-          >
-            <MapIcon className="w-3 h-3" /> Map
-          </button>
-        </div>
-
-        <div className="inline-flex rounded-lg border border-stone-200 p-0.5 bg-stone-100">
-          {[
-            { key: 'all', label: `All Visits (${counts.all})` },
-            { key: 'today', label: `Today (${counts.today})` },
-            { key: 'upcoming', label: `Upcoming (${counts.upcoming})` },
-          ].map((s) => (
+      <div className="flex flex-wrap items-center justify-between gap-2.5 bg-stone-50 p-2.5 rounded-xl border border-stone-200 text-xs">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center bg-stone-200/80 p-0.5 rounded-lg text-xs">
             <button
-              key={s.key}
               type="button"
-              onClick={() => setScope(s.key)}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
-                scope === s.key ? 'bg-white text-[#2563EB] shadow-2xs' : 'text-stone-600'
+              onClick={() => setOnboardingGroupBy('village')}
+              className={`px-3 py-1 rounded-md font-semibold transition-all ${
+                onboardingGroupBy === 'village'
+                  ? 'bg-white text-stone-900 shadow-2xs'
+                  : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              {s.label}
+              Village-wise
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={() => setOnboardingGroupBy('agent')}
+              className={`px-3 py-1 rounded-md font-semibold transition-all ${
+                onboardingGroupBy === 'agent'
+                  ? 'bg-white text-[#2563EB] shadow-2xs'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              Agent-wise
+            </button>
+          </div>
+
+          <div className="flex items-center bg-stone-200/80 p-0.5 rounded-lg text-xs">
+            <button
+              type="button"
+              onClick={() => setOnboardingViewMode('list')}
+              className={`px-3 py-1 rounded-md font-semibold flex items-center gap-1.5 transition-all ${
+                onboardingViewMode === 'list'
+                  ? 'bg-white text-stone-900 shadow-2xs'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <TableIcon className="w-3.5 h-3.5" />
+              List
+            </button>
+            <button
+              type="button"
+              onClick={() => setOnboardingViewMode('map')}
+              className={`px-3 py-1 rounded-md font-semibold flex items-center gap-1.5 transition-all ${
+                onboardingViewMode === 'map'
+                  ? 'bg-white text-[#2563EB] shadow-2xs'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <MapIcon className="w-3.5 h-3.5 text-[#2563EB]" />
+              Map
+            </button>
+          </div>
         </div>
 
-        <select
-          value={office}
-          onChange={(e) => setOffice(e.target.value)}
-          className="text-xs bg-white border border-stone-200 rounded-lg px-2 py-1.5 text-stone-700"
-        >
-          <option value="all">All offices</option>
-          {offices.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-stone-200">
+            <button
+              type="button"
+              onClick={() => setOnboardingSubTab('all')}
+              className={`px-2.5 py-0.5 rounded font-semibold text-[11px] transition-all ${
+                onboardingSubTab === 'all'
+                  ? 'bg-stone-900 text-white'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              All Visits ({visits.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setOnboardingSubTab('today')}
+              className={`px-2.5 py-0.5 rounded font-semibold text-[11px] transition-all ${
+                onboardingSubTab === 'today'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              Today
+            </button>
+            <button
+              type="button"
+              onClick={() => setOnboardingSubTab('upcoming')}
+              className={`px-2.5 py-0.5 rounded font-semibold text-[11px] transition-all ${
+                onboardingSubTab === 'upcoming'
+                  ? 'bg-stone-900 text-white'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              Upcoming
+            </button>
+          </div>
 
-        <div className="flex items-center gap-1.5 bg-white border border-stone-200 rounded-lg px-2 py-1.5 min-w-[180px]">
-          <Search className="w-3.5 h-3.5 text-stone-400 shrink-0" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search candidate, phone, village…"
-            className="w-full bg-transparent text-xs"
-          />
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-stone-500">Office:</span>
+            <select
+              value={onboardingOfficeFilter}
+              onChange={(e) => setOnboardingOfficeFilter(e.target.value)}
+              className="px-2 py-1 bg-white rounded border border-stone-200 text-xs text-stone-800"
+            >
+              <option value="All">All Offices</option>
+              {offices.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-
-        <button
-          type="button"
-          onClick={load}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-semibold text-stone-700 hover:bg-stone-50 ml-auto"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </button>
       </div>
 
       {error && (
         <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-lg px-3 py-2 flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4" /> {error}
+          <AlertTriangle className="w-4 h-4 shrink-0" /> {error}
         </div>
       )}
 
-      {loading ? (
-        <div className="bg-white border border-stone-200 rounded-lg py-14 flex items-center justify-center">
+      {loading && visits.length === 0 ? (
+        <div className="bg-white border border-stone-200 rounded-xl py-14 flex items-center justify-center">
           <span className="inline-flex items-center gap-2 text-xs font-semibold text-stone-500">
             <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" /> Loading schedule…
           </span>
         </div>
-      ) : view === 'map' ? (
-        <div className="bg-white border border-stone-200 rounded-lg p-2.5">
-          <InteractiveMap
-            height="520px"
-            villages={villages}
-            showAllotmentColors
-            agentMapMode
-            candidatePins={filtered
-              .map((visit) => {
-                const vil = villages.find((v) => norm(v.name) === norm(villageOf(visit)));
-                if (!vil?.centerCoordinates?.lat) return null;
-                return {
-                  id: visit.id,
-                  name: visit.candidate?.name || 'Candidate',
-                  village: vil.name,
-                  coordinates: vil.centerCoordinates,
-                };
-              })
-              .filter(Boolean)}
-          />
-          <p className="text-[11px] text-stone-500 mt-2">
-            {filtered.length} booked visit(s) plotted against their interested village.
-          </p>
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="bg-white border border-stone-200 rounded-lg py-14 text-center text-xs text-stone-400">
-          Nothing booked. Schedule a visit from the Interested tab.
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {groups.map(([groupName, rows]) => {
-            const vac = grouping === 'village' ? vacancyOf(groupName) : undefined;
-            return (
+      ) : onboardingViewMode === 'list' ? (
+        onboardingGroupBy === 'agent' ? (
+          /* ── Agent-wise table ─────────────────────────────── */
+          <div className="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-2xs">
+            <table className="w-full text-xs text-left">
+              <thead>
+                <tr className="bg-stone-50 text-stone-600 font-semibold border-b border-stone-200">
+                  <th className="p-3 w-14">Photo</th>
+                  <th className="p-3">Candidate</th>
+                  <th className="p-3">Phone</th>
+                  <th className="p-3">Interested Village</th>
+                  <th className="p-3">Visit Date</th>
+                  <th className="p-3">Office</th>
+                  <th className="p-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-100">
+                {filteredVisits.map((visit) => {
+                  const village = vacancyOf(visit.interestedVillage);
+                  const isToday = visit.visitDate === todayStr;
+
+                  return (
+                    <tr key={visit.id} className="hover:bg-stone-50/80 transition-colors">
+                      <td className="p-3">
+                        <CandidatePhoto
+                          name={visit.candidateName}
+                          photo={visit.photo}
+                          className="w-9 h-9"
+                        />
+                      </td>
+                      <td className="p-3">
+                        <p className="font-bold text-stone-900">{visit.candidateName}</p>
+                        <p className="text-[10px] text-stone-500">
+                          Native: {visit.nativeVillage || '—'}
+                        </p>
+                      </td>
+                      <td className="p-3 font-mono text-stone-700">{visit.phone}</td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-blue-900 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded text-[11px]">
+                            {visit.interestedVillage || '—'}
+                          </span>
+                          {village && (
+                            <span
+                              className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                village.vacancy > 0
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : 'bg-red-50 text-red-700 border border-red-200'
+                              }`}
+                            >
+                              {village.vacancy > 0 ? `${village.vacancy} Open` : 'Full'}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
+                              isToday
+                                ? 'bg-amber-100 text-amber-900 border border-amber-200'
+                                : 'bg-stone-100 text-stone-700'
+                            }`}
+                          >
+                            {visit.visitDate}
+                          </span>
+                          <span className="text-stone-500 text-[11px] font-medium">
+                            {visit.visitTime}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-3 text-stone-700">{visit.regionalOffice}</td>
+                      <td className="p-3 text-right">
+                        <div className="inline-flex items-center gap-1.5">
+                          {visit.status === 'Scheduled' && (
+                            <button
+                              type="button"
+                              onClick={() => setRescheduling({ ...visit.candidate, officeVisits: [visit.raw] })}
+                              title="Move this booking to another date or office"
+                              className="px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px] font-semibold text-stone-700 hover:bg-stone-50 cursor-pointer"
+                            >
+                              Move
+                            </button>
+                          )}
+                          <OnboardButton step={stepOf(visit)} onClick={() => openWizard(visit)} />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filteredVisits.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-stone-400">
+                      No candidate visits matching current filters.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          /* ── Village-wise groups ──────────────────────────── */
+          <div className="space-y-3">
+            {villageWiseVisits.map((group) => (
               <div
-                key={groupName}
-                className="bg-white border border-stone-200 rounded-lg overflow-hidden"
+                key={group.villageName}
+                className="bg-white rounded-xl border border-stone-200 shadow-2xs overflow-hidden"
               >
-                <div className="px-3 py-2 border-b border-stone-200 bg-stone-50/60 flex flex-wrap items-center gap-2">
-                  {grouping === 'village' ? (
-                    <MapPin className="w-3.5 h-3.5 text-[#2563EB]" />
-                  ) : (
-                    <Users className="w-3.5 h-3.5 text-[#2563EB]" />
-                  )}
-                  <h3 className="text-xs font-bold text-stone-900">{groupName}</h3>
-                  <span className="px-1.5 rounded-full bg-stone-200 text-stone-700 text-[10px] font-bold">
-                    {rows.length} candidate(s)
-                  </span>
-                  {vac !== undefined && (
+                <div className="p-3.5 bg-stone-50/90 border-b border-stone-200 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-stone-900 text-sm">{group.villageName}</h3>
+                      {(group.mandal || group.district) && (
+                        <span className="text-[11px] text-stone-500">
+                          ({[group.mandal, group.district].filter(Boolean).join(', ')})
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-stone-500 mt-0.5">
+                      Attached Agents: {group.attachedAgentsCount} of {group.requiredAgents} required
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
                     <span
-                      className={`px-2 py-0.5 rounded border text-[10px] font-bold ${
-                        vac > 0
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${
+                        group.vacancy > 0
                           ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                          : 'bg-rose-50 text-rose-800 border-rose-200'
+                          : 'bg-stone-100 text-stone-600 border-stone-200'
                       }`}
                     >
-                      {vac > 0 ? `${vac} Open` : 'Full'}
+                      Vacancy: {group.vacancy} / {group.requiredAgents}
                     </span>
-                  )}
-                  {vac === 0 && rows.length > 0 && (
-                    <span className="text-[10px] text-amber-800 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
-                      No seat here — these candidates need the waiting queue or another village
+                    <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                      {group.interestedCount} Interested
                     </span>
-                  )}
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-xs">
+                  <table className="w-full text-xs text-left">
                     <thead>
-                      <tr className="bg-white border-b border-stone-200 text-[10px] uppercase tracking-wider text-stone-500">
-                        <th className="text-left font-bold px-3 py-2">Candidate</th>
-                        <th className="text-left font-bold px-3 py-2">Phone</th>
-                        <th className="text-left font-bold px-3 py-2">Interested village</th>
-                        <th className="text-left font-bold px-3 py-2">Visit date</th>
-                        <th className="text-left font-bold px-3 py-2">Office</th>
-                        <th className="text-left font-bold px-3 py-2">Status</th>
-                        <th className="text-right font-bold px-3 py-2">Action</th>
+                      <tr className="bg-stone-50/50 text-stone-500 font-semibold border-b border-stone-100 text-[11px]">
+                        <th className="p-2.5 w-12">Photo</th>
+                        <th className="p-2.5">Candidate</th>
+                        <th className="p-2.5">Phone</th>
+                        <th className="p-2.5">Native Village</th>
+                        <th className="p-2.5">Visit Date / Time</th>
+                        <th className="p-2.5">Office</th>
+                        <th className="p-2.5 text-right">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-100">
-                      {rows.map((visit) => {
-                        const lead = visit.candidate || {};
-                        const isBusy = String(busyId) === String(visit.id);
-                        const vil = villageOf(visit);
-                        const v = vacancyOf(vil);
-                        const step = progress[String(lead.id)] || 0;
-
-                        return (
-                          <tr key={visit.id} className="hover:bg-stone-50/60">
-                            <td className="px-3 py-2">
-                              <PersonAvatar
-                                name={lead.name}
-                                photo={lead.photo}
-                                size="sm"
-                                showDetails
-                                subtext={lead.mandal || lead.district}
-                              />
-                            </td>
-                            <td className="px-3 py-2 text-stone-700 whitespace-nowrap">
-                              {lead.phone || '—'}
-                            </td>
-                            <td className="px-3 py-2">
-                              <span className="inline-flex items-center gap-1.5">
-                                <span className="font-semibold text-stone-800">{vil}</span>
-                                {v !== undefined && (
-                                  <span
-                                    className={`px-1.5 rounded text-[10px] font-bold ${
-                                      v > 0
-                                        ? 'bg-emerald-100 text-emerald-800'
-                                        : 'bg-rose-100 text-rose-800'
-                                    }`}
-                                  >
-                                    {v > 0 ? `${v} Open` : 'Full'}
-                                  </span>
-                                )}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1.5 text-stone-700">
-                                <CalendarDays className="w-3 h-3 text-stone-400" />
-                                {prettyDate(visit.visit_date)}
-                                {visit.visit_time && (
-                                  <span className="text-stone-400">· {visit.visit_time}</span>
-                                )}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2">
-                              <span className="inline-flex items-center gap-1.5 text-stone-600">
-                                <Building2 className="w-3 h-3 text-stone-400" />
-                                {visit.regional_office || '—'}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2">
-                              <span
-                                className={`px-2 py-0.5 rounded-full border text-[10px] font-bold ${
-                                  STATUS_TONES[visit.status] || STATUS_TONES.Cancelled
-                                }`}
-                              >
-                                {visit.status}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2">
-                              <div className="flex items-center justify-end gap-1.5">
-                                <a
-                                  href={lead.phone ? `tel:${lead.phone}` : undefined}
-                                  className="inline-flex items-center justify-center w-7 h-7 rounded-lg border border-stone-200 bg-white text-[#2563EB] hover:bg-stone-50"
-                                  title="Call"
-                                >
-                                  <Phone className="w-3.5 h-3.5" />
-                                </a>
-
-                                {visit.status === 'Scheduled' && (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() => openWizard(visit)}
-                                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-white whitespace-nowrap ${
-                                        step > 0
-                                          ? 'bg-amber-500 hover:bg-amber-600'
-                                          : 'bg-[#2563EB] hover:bg-[#1D4ED8]'
-                                      }`}
-                                    >
-                                      {step > 0 ? (
-                                        <>
-                                          <PlayCircle className="w-3 h-3" />
-                                          Resume · Step {step}
-                                        </>
-                                      ) : (
-                                        <>
-                                          <UserPlus className="w-3 h-3" />
-                                          Open Onboarding
-                                        </>
-                                      )}
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      disabled={isBusy}
-                                      onClick={() => handleStatus(visit, 'Completed')}
-                                      title="Mark attended without onboarding yet"
-                                      className="inline-flex items-center justify-center w-7 h-7 rounded-lg border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 disabled:opacity-40"
-                                    >
-                                      {isBusy ? (
-                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                      ) : (
-                                        <CheckCircle2 className="w-3.5 h-3.5" />
-                                      )}
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => setRescheduling(lead)}
-                                      className="px-2 py-1 rounded-lg border border-stone-200 bg-white text-[11px] font-semibold text-stone-700 hover:bg-stone-50"
-                                    >
-                                      Move
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      disabled={isBusy}
-                                      onClick={() => handleStatus(visit, 'Cancelled')}
-                                      title="Cancel — returns them to Interested"
-                                      className="inline-flex items-center justify-center w-7 h-7 rounded-lg border border-stone-200 bg-white text-stone-500 hover:text-rose-600 hover:border-rose-200 disabled:opacity-40"
-                                    >
-                                      <XCircle className="w-3.5 h-3.5" />
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {group.visits.map((visit) => (
+                        <tr key={visit.id} className="hover:bg-stone-50/60 transition-colors">
+                          <td className="p-2.5">
+                            <CandidatePhoto
+                              name={visit.candidateName}
+                              photo={visit.photo}
+                              className="w-8 h-8"
+                            />
+                          </td>
+                          <td className="p-2.5 font-bold text-stone-900">{visit.candidateName}</td>
+                          <td className="p-2.5 font-mono text-stone-700">{visit.phone}</td>
+                          <td className="p-2.5 text-stone-600">{visit.nativeVillage || '—'}</td>
+                          <td className="p-2.5 text-stone-700 font-medium">
+                            {visit.visitDate} @ {visit.visitTime}
+                          </td>
+                          <td className="p-2.5 text-stone-700">{visit.regionalOffice}</td>
+                          <td className="p-2.5 text-right">
+                            <OnboardButton step={stepOf(visit)} onClick={() => openWizard(visit)} />
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
               </div>
-            );
-          })}
+            ))}
+            {villageWiseVisits.length === 0 && (
+              <div className="p-8 text-center text-stone-400 bg-white rounded-xl border border-stone-200">
+                No villages with scheduled visits found for the selected filter.
+              </div>
+            )}
+          </div>
+        )
+      ) : (
+        /* ── Map with click-to-inspect drawer ────────────────── */
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+          <div className="lg:col-span-8 bg-white rounded-xl border border-stone-200 p-2.5 space-y-2 shadow-2xs">
+            <div className="flex items-center justify-between text-xs px-3 py-1.5 bg-stone-50 rounded-lg border border-stone-200">
+              <span className="font-semibold text-stone-800">
+                Click any village polygon to inspect candidate interest &amp; vacancy:
+              </span>
+              <div className="flex items-center gap-3 text-[11px]">
+                <span className="flex items-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Vacant
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" /> Interest Exists
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-stone-400" /> Filled
+                </span>
+              </div>
+            </div>
+            <InteractiveMap
+              height="480px"
+              villages={villages}
+              candidatePins={candidatePins}
+              showAllotmentColors
+              agentMapMode
+              selectedVillageId={selectedVillage?.id}
+              onSelectVillage={(v) => setSelectedVillage(v)}
+            />
+          </div>
+
+          <div className="lg:col-span-4 bg-white rounded-xl border border-stone-200 p-4 space-y-3.5 shadow-2xs">
+            {selectedVillage ? (
+              <VillageDrawer
+                village={selectedVillage}
+                visits={visits}
+                progress={progress}
+                onOpen={openWizard}
+              />
+            ) : (
+              <div className="py-12 text-center text-stone-400 text-xs space-y-2">
+                <MapPin className="w-6 h-6 mx-auto text-stone-300" />
+                <p>Select any village polygon on the map to inspect vacancy and candidates.</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -524,6 +604,191 @@ export default function OnboardingTab({ refresh }) {
           }}
         />
       )}
+    </div>
+  );
+}
+
+/** "Open Onboarding", or "Resume · Step n" once the wizard has been started for them. */
+function OnboardButton({ step, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-lg font-semibold text-xs inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer text-white ${
+        step > 0 ? 'bg-amber-500 hover:bg-amber-600' : 'bg-[#2563EB] hover:bg-[#1D4ED8]'
+      }`}
+    >
+      {step > 0 ? (
+        <>
+          <span>Resume</span>
+          <span className="bg-amber-700/60 px-1 py-0.2 rounded text-[10px]">Step {step}</span>
+        </>
+      ) : (
+        'Open Onboarding'
+      )}
+    </button>
+  );
+}
+
+/** What the map drawer shows for one village: seats, lands in the zone, candidates. */
+function VillageDrawer({ village, visits, progress, onOpen }) {
+  const [lands, setLands] = useState([]);
+  const [landsLoading, setLandsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLandsLoading(true);
+    agentService
+      .getLandNodes({
+        state: village.state,
+        district: village.district,
+        mandal: village.mandal,
+        village: village.name,
+      })
+      .then((data) => {
+        const list = data.result || data.data || [];
+        if (!cancelled) setLands(Array.isArray(list) ? list : []);
+      })
+      .catch((err) => {
+        console.error('Failed to load lands in zone:', err);
+        if (!cancelled) setLands([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLandsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [village.state, village.district, village.mandal, village.name]);
+
+  const candidates = visits.filter(
+    (v) =>
+      norm(v.interestedVillage) === norm(village.name) ||
+      (v.candidate.interests || []).some((i) => norm(i.village) === norm(village.name))
+  );
+
+  const totalAcres = lands.reduce((acc, l) => acc + (Number(l.total_acres) || 0), 0);
+
+  return (
+    <div className="space-y-3">
+      <div className="pb-2 border-b border-stone-200">
+        <span className="text-[10px] text-stone-400 uppercase tracking-wider font-semibold">
+          Village Allotment Status
+        </span>
+        <h3 className="font-bold text-base text-stone-900">{village.name}</h3>
+        <p className="text-xs text-stone-500">
+          {village.mandal}, {village.district}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="p-2 bg-stone-50 rounded-lg border border-stone-200">
+          <span className="text-[10px] text-stone-500 block">Required</span>
+          <span className="font-bold text-stone-900 text-sm">{village.requiredAgents}</span>
+        </div>
+        <div className="p-2 bg-stone-50 rounded-lg border border-stone-200">
+          <span className="text-[10px] text-stone-500 block">Attached</span>
+          <span className="font-bold text-stone-900 text-sm">{village.attachedAgentsCount}</span>
+        </div>
+        <div className="p-2 bg-stone-50 rounded-lg border border-stone-200">
+          <span className="text-[10px] text-stone-500 block">Vacancy</span>
+          <span
+            className={`font-bold text-sm ${
+              village.vacancy > 0 ? 'text-emerald-600' : 'text-stone-400'
+            }`}
+          >
+            {village.vacancy}
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-1.5 pt-1 border-t border-stone-100">
+        <div className="flex items-center justify-between">
+          <h4 className="font-bold text-stone-800 text-xs uppercase tracking-wider flex items-center gap-1">
+            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Lands in Zone ({lands.length})</span>
+          </h4>
+          <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+            {Math.round(totalAcres * 10) / 10} Ac Total
+          </span>
+        </div>
+        <div className="space-y-1.5 max-h-36 overflow-y-auto">
+          {landsLoading ? (
+            <p className="text-[11px] text-stone-400 py-1 inline-flex items-center gap-1.5">
+              <Loader2 className="w-3 h-3 animate-spin" /> Loading lands…
+            </p>
+          ) : lands.length > 0 ? (
+            lands.map((land) => {
+              const acres = Number(land.total_acres) || 0;
+              const perAcre = acres > 0 ? (Number(land.total_value) || 0) / acres : 0;
+              return (
+                <div
+                  key={land.id}
+                  className="p-2 rounded-lg border border-stone-200 bg-stone-50/70 text-[11px] space-y-0.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-stone-900">LD-{land.id}</span>
+                    <span className="font-bold text-emerald-700 font-mono">
+                      {Math.round(acres * 10) / 10} Ac
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-stone-500 text-[10px]">
+                    <span>Farmer: {land.farmer_name || '—'}</span>
+                    {perAcre > 0 && <span>₹{(perAcre / 100000).toFixed(1)}L/Ac</span>}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-[11px] text-stone-400 italic py-1">
+              No lands registered yet in {village.name}.
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-1 border-t border-stone-100">
+        <h4 className="font-bold text-stone-800 text-xs uppercase tracking-wider flex items-center justify-between">
+          <span>Interested Candidates</span>
+          <span className="text-[#2563EB] font-mono">{candidates.length}</span>
+        </h4>
+
+        <div className="space-y-2 max-h-72 overflow-y-auto">
+          {candidates.map((visit) => {
+            const step = progress[String(visit.candidateId)] || 0;
+            return (
+              <div
+                key={visit.id}
+                className="p-2.5 rounded-lg border border-stone-200 bg-stone-50/80 space-y-1.5 text-xs"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-stone-900">{visit.candidateName}</span>
+                  <span className="font-mono text-stone-600">{visit.phone}</span>
+                </div>
+                <p className="text-[11px] text-stone-500">Native: {visit.nativeVillage || '—'}</p>
+                <p className="text-[10px] text-blue-700 bg-blue-50 border border-blue-200 rounded px-1.5 py-0.5">
+                  Visit: {visit.visitDate} @ {visit.visitTime} ({visit.regionalOffice})
+                </p>
+                <button
+                  type="button"
+                  onClick={() => onOpen(visit)}
+                  className={`w-full py-1.5 rounded-lg font-semibold text-xs shadow-2xs transition-colors text-white cursor-pointer ${
+                    step > 0 ? 'bg-amber-500 hover:bg-amber-600' : 'bg-[#2563EB] hover:bg-[#1D4ED8]'
+                  }`}
+                >
+                  {step > 0 ? `Resume Step ${step}` : 'Open Onboarding'}
+                </button>
+              </div>
+            );
+          })}
+
+          {candidates.length === 0 && (
+            <p className="text-stone-400 text-xs text-center py-4">
+              No candidates interested in this village yet.
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

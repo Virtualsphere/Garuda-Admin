@@ -4,20 +4,23 @@ import { UsersRound } from 'lucide-react';
 import agentLeadService from '../../services/agentLeadService';
 import agentService from '../../services/agentService';
 
+import RecruitmentDeskProvider from './Recruitment/RecruitmentDesk';
 import LeadsTab from './Recruitment/LeadsTab';
 import AllotLeadsTab from './Recruitment/AllotLeadsTab';
 import CallsTab from './Recruitment/CallsTab';
+import NotLiftedInvalidTab from './Recruitment/NotLiftedInvalidTab';
 import TeamLeaderTab from './Recruitment/TeamLeaderTab';
 import InterestedTab from './Recruitment/InterestedTab';
 import OnboardingTab from './Recruitment/OnboardingTab';
+import ReportsTab from './Recruitment/ReportsTab';
 import CoordinationSection from './coordination/CoordinationSection';
 import ManagementSection from './management/ManagementSection';
 import AgentProfileDrawer from './AgentProfileDrawer';
 
 /**
  * Root of the Agents department, rebuilt to match the Garuda prototype's
- * information architecture: three modes, with Recruitment carrying six working
- * queues across the top.
+ * information architecture: three modes, with Recruitment carrying eight tabs
+ * across the top — seven working queues and the Reports page.
  *
  * This subtree is styled with Tailwind rather than the app's per-section CSS
  * variables — see src/styles/agents-tailwind.css. `.garuda-agents` is what
@@ -27,21 +30,27 @@ import AgentProfileDrawer from './AgentProfileDrawer';
  * tab, so the badges and the tab contents can never disagree.
  */
 
+// `badge` names the /queue-counts key a tab shows. `always` tabs keep their tone
+// at zero; the rest go neutral when their queue is empty, which is how the
+// prototype signals "nothing waiting here".
 const RECRUITMENT_TABS = [
   { key: 'leads', label: 'Leads' },
   { key: 'allot-leads', label: 'Allot Leads', badge: 'unallotted', tone: 'blue' },
-  { key: 'calls', label: 'Calls', badge: 'calls', tone: 'blue' },
+  { key: 'calls', label: 'Calls', badge: 'calls', tone: 'blue', always: true },
+  { key: 'not-lifted-invalid', label: 'Not Lifted & Invalid', badge: 'not-lifted-invalid', tone: 'amber' },
   { key: 'team-leader', label: 'Team Leader', badge: 'team-leader', tone: 'amber' },
-  { key: 'interested', label: 'Interested', badge: 'interested', tone: 'stone' },
-  { key: 'onboarding', label: 'Onboarding', badge: 'onboarding', tone: 'emerald' },
+  { key: 'interested', label: 'Interested', badge: 'interested', tone: 'stone', always: true },
+  { key: 'onboarding', label: 'Onboarding', badge: 'onboarding', tone: 'emerald', always: true },
+  { key: 'reporting', label: 'Reports', tone: 'report' },
 ];
 
 const BADGE_TONES = {
-  blue: 'bg-blue-100 text-[#2563EB] border border-blue-200',
-  amber: 'bg-amber-100 text-amber-900 border border-amber-300',
-  emerald: 'bg-emerald-100 text-emerald-800',
+  blue: 'bg-blue-100 text-[#2563EB] border border-blue-200 font-bold',
+  amber: 'bg-amber-100 text-amber-900 border border-amber-300 font-bold',
+  emerald: 'bg-emerald-100 text-emerald-800 font-bold',
   stone: 'bg-stone-100 text-stone-700',
-  idle: 'bg-stone-100 text-stone-600',
+  report: 'bg-blue-50 text-blue-700 border border-blue-200 font-bold',
+  idle: 'bg-stone-100 text-stone-600 font-bold',
 };
 
 export default function AgentsModule({ activeTab = 'recruitment' }) {
@@ -84,15 +93,24 @@ export default function AgentsModule({ activeTab = 'recruitment' }) {
   }, [loadCounts]);
 
   const badgeFor = (tab) => {
+    // Reports is a page, not a queue: its pill is a label rather than a count.
+    if (tab.tone === 'report') {
+      return (
+        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${BADGE_TONES.report}`}>
+          Working Reports
+        </span>
+      );
+    }
     if (!tab.badge) return null;
+
     const value =
       tab.badge === 'calls'
         ? (counts['first-call'] || 0) + (counts['follow-up'] || 0) + (counts['not-lifted'] || 0)
         : counts[tab.badge] || 0;
 
-    const tone = value > 0 ? BADGE_TONES[tab.tone] : BADGE_TONES.idle;
+    const tone = value > 0 || tab.always ? BADGE_TONES[tab.tone] : BADGE_TONES.idle;
     return (
-      <span className={`px-1.5 rounded-full text-[10px] font-bold ${tone}`}>{value}</span>
+      <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${tone}`}>{value}</span>
     );
   };
 
@@ -127,32 +145,38 @@ export default function AgentsModule({ activeTab = 'recruitment' }) {
 
       {/* ── RECRUITMENT ─────────────────────────────────────── */}
       {activeTab === 'recruitment' && (
-        <div className="space-y-3">
-          <div className="flex border-b border-stone-200 gap-1 text-xs overflow-x-auto">
-            {RECRUITMENT_TABS.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setAgentOpsTab(tab.key)}
-                className={`py-2 px-3.5 font-medium transition-colors border-b-2 flex items-center gap-1.5 shrink-0 ${
-                  agentOpsTab === tab.key
-                    ? 'border-[#2563EB] text-[#2563EB] font-bold'
-                    : 'border-transparent text-stone-500 hover:text-stone-800'
-                }`}
-              >
-                {tab.label}
-                {badgeFor(tab)}
-              </button>
-            ))}
-          </div>
+        <RecruitmentDeskProvider agents={agents} onOpenAgent={setProfileAgent} onChanged={refresh}>
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between border-b border-stone-200 gap-2 text-xs pb-1 sm:pb-0">
+              <div className="flex gap-1 overflow-x-auto">
+                {RECRUITMENT_TABS.map((tab) => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setAgentOpsTab(tab.key)}
+                    className={`py-2 px-3.5 font-medium transition-colors border-b-2 flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                      agentOpsTab === tab.key
+                        ? 'border-[#2563EB] text-[#2563EB] font-bold'
+                        : 'border-transparent text-stone-500 hover:text-stone-800'
+                    }`}
+                  >
+                    {tab.label}
+                    {badgeFor(tab)}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          {agentOpsTab === 'leads' && <LeadsTab {...shared} />}
-          {agentOpsTab === 'allot-leads' && <AllotLeadsTab {...shared} />}
-          {agentOpsTab === 'calls' && <CallsTab {...shared} />}
-          {agentOpsTab === 'team-leader' && <TeamLeaderTab {...shared} />}
-          {agentOpsTab === 'interested' && <InterestedTab {...shared} />}
-          {agentOpsTab === 'onboarding' && <OnboardingTab {...shared} />}
-        </div>
+            {agentOpsTab === 'leads' && <LeadsTab />}
+            {agentOpsTab === 'allot-leads' && <AllotLeadsTab />}
+            {agentOpsTab === 'calls' && <CallsTab />}
+            {agentOpsTab === 'not-lifted-invalid' && <NotLiftedInvalidTab onNavigate={setAgentOpsTab} />}
+            {agentOpsTab === 'team-leader' && <TeamLeaderTab {...shared} />}
+            {agentOpsTab === 'interested' && <InterestedTab {...shared} />}
+            {agentOpsTab === 'onboarding' && <OnboardingTab {...shared} />}
+            {agentOpsTab === 'reporting' && <ReportsTab />}
+          </div>
+        </RecruitmentDeskProvider>
       )}
 
       {/* ── COORDINATION ────────────────────────────────────── */}

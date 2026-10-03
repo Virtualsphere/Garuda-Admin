@@ -718,11 +718,13 @@ function Section({ n, tone, title, subtitle, badge, children }) {
 }
 
 function Row({ label, value }) {
+  const displayValue =
+    typeof value === 'string' || typeof value === 'number' ? value : null;
   return (
     <div className="flex items-center justify-between gap-2">
       <span className="text-stone-500 shrink-0">{label}:</span>
-      {value ? (
-        <span className="font-semibold text-stone-800 truncate text-right">{value}</span>
+      {displayValue ? (
+        <span className="font-semibold text-stone-800 truncate text-right">{displayValue}</span>
       ) : (
         <span className="text-stone-400 text-[11px]">Not recorded</span>
       )}

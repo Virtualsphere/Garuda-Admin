@@ -56,6 +56,26 @@
   --text-4xl: 36px;
   --text-4xl--line-height: 40px;
 
+  /**
+   * Same reason for the container widths behind max-w-md / max-w-5xl and
+   * friends: they are rem-based, so every modal and card cap came out 12%
+   * narrower than the prototype's. (Breakpoints like lg: are unaffected —
+   * rem in a media query is always the browser's 16px, not html's 14px.)
+   */
+  --container-3xs: 256px;
+  --container-2xs: 288px;
+  --container-xs: 320px;
+  --container-sm: 384px;
+  --container-md: 448px;
+  --container-lg: 512px;
+  --container-xl: 576px;
+  --container-2xl: 672px;
+  --container-3xl: 768px;
+  --container-4xl: 896px;
+  --container-5xl: 1024px;
+  --container-6xl: 1152px;
+  --container-7xl: 1280px;
+
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -78,13 +98,16 @@
  * The slice of Tailwind's preflight the Agents tree genuinely needs. Without
  * it `border` sets a width against `border-style: none` and draws nothing.
  * Scoped to .garuda-agents so no other section is touched.
+ *
+ * Wrapped in :where() so the whole selector has zero specificity. As a plain
+ * `.garuda-agents *` it is (0,1,0) — equal to a utility like `.border` — and,
+ * coming later in the file, its `border-width: 0` beat every border utility in
+ * the tree (`border`, `border-b-2`, `border-t`...), leaving cards, tab
+ * underlines and inputs borderless. A default has to lose to the utilities.
  */
-.garuda-agents *,
-.garuda-agents *::before,
-.garuda-agents *::after,
-.garuda-ui *,
-.garuda-ui *::before,
-.garuda-ui *::after {
+:where(.garuda-agents, .garuda-ui) *,
+:where(.garuda-agents, .garuda-ui) *::before,
+:where(.garuda-agents, .garuda-ui) *::after {
   border-width: 0;
   border-style: solid;
   border-color: var(--color-garuda-line);
@@ -96,7 +119,10 @@
 }
 
 .garuda-agents {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* The prototype loads no web font and so renders in Tailwind's default UI
+     stack. Forcing Inter here made every line ~7% wider, which is enough to
+     wrap toolbars the prototype keeps on one row. */
+  font-family: var(--font-sans);
   color: var(--color-stone-900);
   /* The section scrolls internally; the app shell owns the viewport. */
   height: 100%;
@@ -119,6 +145,15 @@
 .garuda-ui select,
 .garuda-agents select {
   cursor: pointer;
+}
+
+/* index.css makes buttons and inputs inherit the font but not these two, so
+   without this a <textarea> falls back to the browser's monospace. */
+.garuda-ui textarea,
+.garuda-ui select,
+.garuda-agents textarea,
+.garuda-agents select {
+  font-family: inherit;
 }
 
 /* ── Leaflet surface ─────────────────────────────────────────────── */

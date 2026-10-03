@@ -54,6 +54,33 @@ const recruitmentService = {
     return data;
   },
 
+  /**
+   * "This candidate wants that village": records the interest *and* makes sure
+   * the lead is in the Interested queue. The two are separate on the server —
+   * adding an interest row does not move the lead's stage — so doing only the
+   * first would leave someone who said yes invisible on the Interested tab.
+   *
+   * The stage is only ever promoted. A lead already booked in to an office or
+   * selected for a seat must not be dragged back to INTERESTED by one more
+   * village being ticked.
+   */
+  async markInterested(candidateId, villages, { stage, note } = {}) {
+    const names = (Array.isArray(villages) ? villages : [villages]).filter(Boolean);
+    if (!names.length) return null;
+
+    const result = await recruitmentService.addInterests(candidateId, names);
+
+    const EARLY = ['NEW_LEAD', 'FIRST_CALL', 'LOCATION_CHECK'];
+    if (!stage || EARLY.includes(stage)) {
+      await recruitmentService.updateCandidateStatus(
+        candidateId,
+        'INTERESTED',
+        note || `Interested in ${names.join(', ')}`
+      );
+    }
+    return result;
+  },
+
   // ── Village positions (seats) ────────────────────────────────
   async getPositions(filters = {}) {
     const { data } = await apiClient.get('/recruitment/position', { params: filters });

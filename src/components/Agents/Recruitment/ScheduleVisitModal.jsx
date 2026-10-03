@@ -9,25 +9,11 @@ import Modal, {
   GhostButton,
 } from '../common/Modal';
 import agentLeadService from '../../../services/agentLeadService';
-
-// Regional offices the desk books candidates into. Kept here rather than in a
-// shared constants module because only this form offers the choice.
-const REGIONAL_OFFICES = [
-  'Kalwakurthy RO',
-  'Nagarkurnool RO',
-  'Achampet RO',
-  'Kollapur RO',
-  'Hyderabad Head Office',
-];
-
-const TIME_SLOTS = [
-  '10:00 AM',
-  '11:00 AM',
-  '12:00 PM',
-  '2:00 PM',
-  '3:00 PM',
-  '4:00 PM',
-];
+import {
+  REGIONAL_OFFICES,
+  DEFAULT_REGIONAL_OFFICE,
+  VISIT_TIME_SLOTS as TIME_SLOTS,
+} from './recruitmentConstants';
 
 const tomorrowISO = () => {
   const d = new Date();
@@ -46,7 +32,7 @@ export default function ScheduleVisitModal({ lead, onClose, onDone }) {
   const existing = (lead.officeVisits || []).find((v) => v.status === 'Scheduled');
 
   const [regionalOffice, setRegionalOffice] = useState(
-    existing?.regional_office || REGIONAL_OFFICES[0]
+    existing?.regional_office || DEFAULT_REGIONAL_OFFICE
   );
   const [visitDate, setVisitDate] = useState(existing?.visit_date || tomorrowISO());
   const [visitTime, setVisitTime] = useState(existing?.visit_time || TIME_SLOTS[0]);
@@ -124,7 +110,12 @@ export default function ScheduleVisitModal({ lead, onClose, onDone }) {
             onChange={(e) => setRegionalOffice(e.target.value)}
             className={inputClass}
           >
-            {REGIONAL_OFFICES.map((o) => (
+            {/* A visit booked before the shared list existed may name an office
+                that is not in it; keep it selectable rather than silently swapping it. */}
+            {(REGIONAL_OFFICES.includes(regionalOffice)
+              ? REGIONAL_OFFICES
+              : [regionalOffice, ...REGIONAL_OFFICES]
+            ).map((o) => (
               <option key={o} value={o}>
                 {o}
               </option>

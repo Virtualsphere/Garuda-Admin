@@ -1,281 +1,358 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  Search,
-  Grid,
   Phone,
-  PhoneOff,
+  PhoneCall,
   PhoneForwarded,
-  PhoneIncoming,
-  ArrowUpRight,
-  Layers,
+  Clock,
+  Users,
+  CheckCircle2,
+  Calendar,
+  Search,
+  ExternalLink,
+  Eye,
   Loader2,
   AlertTriangle,
-  PanelRight,
-  PanelRightClose,
-  TrendingUp,
-  UserRound,
-  RefreshCw,
 } from 'lucide-react';
 
 import PersonAvatar from '../common/PersonAvatar';
-import CallWorkspaceModal from './CallWorkspaceModal';
-import useAgentTeams from '../../../hooks/useAgentTeams';
-import agentLeadService from '../../../services/agentLeadService';
+import { useRecruitmentDesk } from '../../../hooks/useRecruitmentDesk';
+import useAgentLeads from '../../../hooks/useAgentLeads';
+import {
+  squadLabel,
+  firstName,
+  sameId,
+  isFirstCall,
+  isNotLifted,
+  todayISO,
+  tomorrowISO,
+} from './recruitmentModel';
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
-const tomorrowISO = () => {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
+const SUB_TABS = [
+  { key: 'first-calls', label: 'First Calls' },
+  { key: 'follow-ups', label: 'Follow-ups' },
+  { key: 'not-lifted', label: 'Not Lifted' },
+  { key: 'all', label: 'All Calls' },
+];
+
+const STRIP_TITLES = {
+  'first-calls': 'Fresh Leads Waiting for First Contact',
+  'follow-ups': 'Scheduled Follow-up Calls',
+  'not-lifted': 'Ringing Unanswered Calls (Re-attempt Queue)',
+  all: 'All Inquiries in Scope',
+};
+
+const EMPTY_HINTS = {
+  'first-calls': 'All fresh first calls have been initiated. Check follow-ups or not-lifted queues.',
+  'follow-ups': 'No follow-up calls scheduled for the selected date.',
+  'not-lifted': 'No unanswered calls currently pending retry.',
+  all: 'No candidate records match the active search and filter criteria.',
+};
+
+/** Which queue a dial came from, so the attempt history can say so later. */
+const queueOf = (subTab, lead) => {
+  if (subTab === 'first-calls') return 'first-call';
+  if (subTab === 'follow-ups') return 'follow-up';
+  if (subTab === 'not-lifted') return 'not-lifted';
+  if (lead.followUpDate) return 'follow-up';
+  if (isNotLifted(lead)) return 'not-lifted';
+  return 'first-call';
 };
 
 /**
- * The calling floor.
+ * The calling floor: pick a squad, pick a caller (or neither), work a queue.
  *
- * The stage grid across the top doubles as the queue switcher, because the
- * numbers and the tabs are the same thing — an operator reading "12 first
- * calls" should be able to click it and be in that queue.
- *
- * The queues deliberately overlap: a lead never lifted, with a call-back
- * booked, is in both. That mirrors how the desk counts them.
+ * The queues deliberately overlap — a lead never lifted with a call-back booked
+ * is in both — because that is how the desk counts them. The Calls badge is
+ * the sum of the first three for the same reason.
  */
-export default function CallsTab({ counts = {}, refresh, onNavigate }) {
-  const { teams, employeeById, loading: teamsLoading } = useAgentTeams();
+export default function CallsTab() {
+  const { teams, employeeById, rosterLoading, rosterError, callLead, openLead } =
+    useRecruitmentDesk();
+  const { leads, loading, error: loadError } = useAgentLeads();
 
-  const [leads, setLeads] = useState([]);
-  const [performance, setPerformance] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [subTab, setSubTab] = useState('first-calls');
-  const [followUpFilter, setFollowUpFilter] = useState('all');
-  const [customDate, setCustomDate] = useState(todayISO());
-  const [teamFilter, setTeamFilter] = useState('All');
-  const [callerFilter, setCallerFilter] = useState('All');
+  const [selectedTeamId, setSelectedTeamId] = useState('All');
+  const [selectedExecutiveId, setSelectedExecutiveId] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showReportPanel, setShowReportPanel] = useState(true);
-  const [callLead, setCallLead] = useState(null);
+  const [callsSubTab, setCallsSubTab] = useState('first-calls');
+  const [followUpFilter, setFollowUpFilter] = useState('all');
+  const [followUpCustomDate, setFollowUpCustomDate] = useState('');
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [leadsData, perfData] = await Promise.all([
-        agentLeadService.getLeads({}),
-        agentLeadService.getPerformance({}),
-      ]);
-      const list = leadsData.result || leadsData.data || [];
-      setLeads(Array.isArray(list) ? list : []);
-      setPerformance(perfData.result || perfData.data || []);
-      setError(null);
-    } catch (err) {
-      console.error('Failed to load the calling floor:', err);
-      setLeads([]);
-      setError('Could not load the call queues.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const todayStr = todayISO();
+  const tomorrowStr = tomorrowISO();
 
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  /* ── Callers ──────────────────────────────────────────────── */
-
-  // Everyone who can be dialling: every squad's leader plus their members.
-  const callers = useMemo(() => {
-    const map = new Map();
-    teams.forEach((team) => {
-      const leader = employeeById.get(String(team.teamLeaderId));
-      if (leader) map.set(String(leader.id), { ...leader, teamName: team.shortName });
-      (team.members || []).forEach((m) =>
-        map.set(String(m.id), { ...m, teamName: team.shortName })
-      );
-    });
-    return [...map.values()];
-  }, [teams, employeeById]);
-
-  const visibleCallers = useMemo(
-    () =>
-      teamFilter === 'All'
-        ? callers
-        : callers.filter((c) => {
-            const team = teams.find((t) => String(t.id) === String(teamFilter));
-            if (!team) return false;
-            return (
-              String(team.teamLeaderId) === String(c.id) ||
-              (team.memberIds || []).some((id) => String(id) === String(c.id))
-            );
-          }),
-    [callers, teamFilter, teams]
+  const currentTeam = useMemo(
+    () => (selectedTeamId === 'All' ? null : teams.find((t) => sameId(t.id, selectedTeamId)) || null),
+    [teams, selectedTeamId]
   );
 
-  /* ── Queues ───────────────────────────────────────────────── */
+  /* ── Who can be dialling ──────────────────────────────────── */
 
-  const scoped = useMemo(() => {
+  // Every squad's leader and members, plus anyone who has been handed leads even
+  // if they have since left a squad — their leads still need working.
+  const allCallingExecutives = useMemo(() => {
+    const ids = new Set();
+    teams.forEach((t) => {
+      if (t.teamLeaderId) ids.add(String(t.teamLeaderId));
+      (t.memberIds || []).forEach((id) => ids.add(String(id)));
+    });
+    leads.forEach((l) => l.assignedTelecallerId && ids.add(String(l.assignedTelecallerId)));
+
+    return [...ids].map((id) => employeeById.get(id)).filter(Boolean);
+  }, [teams, leads, employeeById]);
+
+  const displayExecutives = useMemo(() => {
+    if (!currentTeam) return allCallingExecutives;
+
+    const ids = new Set([String(currentTeam.teamLeaderId), ...(currentTeam.memberIds || [])]);
+    leads.forEach((l) => {
+      if (sameId(l.assignedTeamId, currentTeam.id) && l.assignedTelecallerId) {
+        ids.add(String(l.assignedTelecallerId));
+      }
+    });
+    return allCallingExecutives.filter((e) => ids.has(String(e.id)));
+  }, [currentTeam, allCallingExecutives, leads]);
+
+  const selectedExecutive = useMemo(
+    () =>
+      selectedExecutiveId === 'All' ? null : employeeById.get(String(selectedExecutiveId)) || null,
+    [employeeById, selectedExecutiveId]
+  );
+
+  const allTeamsSummary = useMemo(
+    () =>
+      teams.map((team) => ({
+        team,
+        leader: employeeById.get(String(team.teamLeaderId)),
+        leadsCount: leads.filter((l) => sameId(l.assignedTeamId, team.id)).length,
+        shortName: squadLabel(team),
+      })),
+    [teams, leads, employeeById]
+  );
+
+  const handleTeamLeaderClick = (team) => {
+    setSelectedExecutiveId('All');
+    setSelectedTeamId((prev) => (sameId(prev, team.id) ? 'All' : String(team.id)));
+  };
+
+  /* ── Scope, then queues ───────────────────────────────────── */
+
+  const scopedLeads = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
+
     return leads.filter((lead) => {
-      if (teamFilter !== 'All' && String(lead.assigned_team_id) !== String(teamFilter))
-        return false;
-      if (
-        callerFilter !== 'All' &&
-        String(lead.assigned_employee_id) !== String(callerFilter)
-      )
-        return false;
-      if (
-        q &&
-        !String(lead.name || '').toLowerCase().includes(q) &&
-        !String(lead.phone || '').includes(q) &&
-        !String(lead.village || '').toLowerCase().includes(q)
-      )
-        return false;
-      return true;
+      // The squad filter only applies while no caller is picked — a caller is
+      // already a narrower scope than the squad they sit in.
+      if (selectedExecutiveId === 'All') {
+        if (selectedTeamId !== 'All' && !sameId(lead.assignedTeamId, selectedTeamId)) return false;
+      } else {
+        // "Their" calls: leads they own, owe a call-back on, or dialled last.
+        const mine =
+          sameId(lead.assignedTelecallerId, selectedExecutiveId) ||
+          sameId(lead.followUpBy, selectedExecutiveId) ||
+          sameId(lead.lastAttemptBy, selectedExecutiveId);
+        if (!mine) return false;
+      }
+
+      if (!q) return true;
+      return (
+        lead.name.toLowerCase().includes(q) ||
+        lead.phone.includes(q) ||
+        lead.nativeVillage.toLowerCase().includes(q) ||
+        lead.mandal.toLowerCase().includes(q) ||
+        lead.district.toLowerCase().includes(q)
+      );
     });
-  }, [leads, teamFilter, callerFilter, searchQuery]);
+  }, [leads, selectedTeamId, selectedExecutiveId, searchQuery]);
 
-  const queues = useMemo(() => {
-    const firstCalls = scoped.filter((l) => (Number(l.call_attempts) || 0) === 0);
-    const notLifted = scoped.filter((l) =>
-      ['Not Lifted', 'No Answer'].includes(l.last_call_status)
-    );
+  const firstCallsQueue = useMemo(() => scopedLeads.filter(isFirstCall), [scopedLeads]);
 
-    const followUps = scoped.filter((l) => {
-      if (!l.follow_up_date) return false;
-      if (followUpFilter === 'today') return l.follow_up_date === todayISO();
-      if (followUpFilter === 'tomorrow') return l.follow_up_date === tomorrowISO();
-      if (followUpFilter === 'custom') return l.follow_up_date === customDate;
-      return true;
-    });
+  const followUpsQueue = useMemo(
+    () =>
+      scopedLeads.filter((lead) => {
+        if (!lead.followUpDate) return false;
+        if (followUpFilter === 'today') return lead.followUpDate === todayStr;
+        if (followUpFilter === 'tomorrow') return lead.followUpDate === tomorrowStr;
+        if (followUpFilter === 'custom' && followUpCustomDate) {
+          return lead.followUpDate === followUpCustomDate;
+        }
+        return true;
+      }),
+    [scopedLeads, followUpFilter, followUpCustomDate, todayStr, tomorrowStr]
+  );
 
-    return { firstCalls, followUps, notLifted, all: scoped };
-  }, [scoped, followUpFilter, customDate]);
+  const notLiftedQueue = useMemo(() => scopedLeads.filter(isNotLifted), [scopedLeads]);
 
-  const activeQueue =
-    subTab === 'first-calls'
-      ? queues.firstCalls
-      : subTab === 'follow-ups'
-      ? queues.followUps
-      : subTab === 'not-lifted'
-      ? queues.notLifted
-      : queues.all;
+  const currentDisplayedLeads =
+    callsSubTab === 'follow-ups'
+      ? followUpsQueue
+      : callsSubTab === 'not-lifted'
+      ? notLiftedQueue
+      : callsSubTab === 'all'
+      ? scopedLeads
+      : firstCallsQueue;
 
-  /* ── Report panel ─────────────────────────────────────────── */
+  const countOf = { 'first-calls': firstCallsQueue.length, 'follow-ups': followUpsQueue.length, 'not-lifted': notLiftedQueue.length, all: scopedLeads.length };
 
-  const report = useMemo(() => {
-    const allotted = scoped.filter((l) => l.assigned_employee_id).length;
-    const connected = scoped.filter((l) => l.last_call_status === 'Answered').length;
-    const interested = scoped.filter((l) =>
-      ['INTERESTED', 'VILLAGE_INTEREST', 'SELECTED', 'OFFICE_VISIT'].includes(l.status)
-    ).length;
-    const joined = leads.filter((l) => l.status === 'JOINED').length;
-
-    const perf =
-      callerFilter === 'All'
-        ? null
-        : performance.find((p) => String(p.employee_id) === String(callerFilter));
-
-    return {
-      allotted,
-      connected,
-      interested,
-      joined,
-      interestedRate: connected ? Math.round((interested / connected) * 100) : 0,
-      onboardedRate: interested ? Math.round((joined / interested) * 100) : 0,
-      perf,
-    };
-  }, [scoped, leads, performance, callerFilter]);
-
-  const selectedCaller =
-    callerFilter === 'All' ? null : callers.find((c) => String(c.id) === String(callerFilter));
-
-  const STAGES = [
-    {
-      key: 'first-calls',
-      label: 'First Calls',
-      sub: 'Never dialled',
-      icon: PhoneIncoming,
-      count: queues.firstCalls.length,
-      tone: 'blue',
-    },
-    {
-      key: 'follow-ups',
-      label: 'Follow-ups',
-      sub: 'Call-back booked',
-      icon: PhoneForwarded,
-      count: queues.followUps.length,
-      tone: 'amber',
-    },
-    {
-      key: 'not-lifted',
-      label: 'Not Lifted',
-      sub: 'Nobody picked up',
-      icon: PhoneOff,
-      count: queues.notLifted.length,
-      tone: 'rose',
-    },
-    {
-      key: 'tl',
-      label: 'TL Escalation',
-      sub: 'With a team leader',
-      icon: ArrowUpRight,
-      count: counts['team-leader'] || 0,
-      tone: 'purple',
-      navigate: 'team-leader',
-    },
-    {
-      key: 'all',
-      label: 'Total Scoped',
-      sub: 'Everything in view',
-      icon: Layers,
-      count: scoped.length,
-      tone: 'stone',
-    },
-  ];
-
-  const selectClass =
-    'px-2 py-1 bg-stone-50 rounded border border-stone-200 text-xs font-medium text-stone-700 focus:bg-white';
+  const error = loadError || rosterError;
 
   return (
     <div className="space-y-3">
-      {/* Header */}
-      <div className="bg-white p-3 rounded-lg border border-stone-200 shadow-2xs flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 block">
-            Calling Floor
-          </span>
-          <h2 className="text-xs font-bold text-stone-900 mt-0.5">
-            Work the queues in order: first calls, then call-backs, then retries
-          </h2>
+      {/* ── Header & filter bar ─────────────────────────── */}
+      <div className="bg-white rounded-xl border border-stone-200 p-2.5 shadow-2xs space-y-2">
+        {/* Row 1: title + squads in one line + search */}
+        <div className="flex flex-wrap lg:flex-nowrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
+              <PhoneCall className="w-3.5 h-3.5" />
+            </div>
+            <h2 className="text-xs sm:text-sm font-bold text-stone-900 whitespace-nowrap">
+              Agent Calling Workspace
+            </h2>
+          </div>
+
+          <div className="hidden lg:block w-px h-6 bg-stone-200 shrink-0" />
+
+          <div className="flex items-center gap-1.5 overflow-x-auto min-w-0 flex-1 py-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedTeamId('All');
+                setSelectedExecutiveId('All');
+              }}
+              title="Show all squads together"
+              className={`text-[11px] px-2 py-1 rounded-md shrink-0 transition-colors border ${
+                selectedTeamId === 'All'
+                  ? 'bg-blue-600 text-white border-blue-600 font-bold shadow-2xs'
+                  : 'bg-stone-50 text-stone-600 border-stone-200 hover:bg-stone-100 font-medium'
+              }`}
+            >
+              All Squads
+            </button>
+
+            {allTeamsSummary.map(({ team, leader, leadsCount, shortName }) => {
+              const isSelected = sameId(team.id, selectedTeamId);
+              const leaderName = leader?.name || team.teamLeaderName;
+
+              return (
+                <button
+                  key={team.id}
+                  type="button"
+                  onClick={() => handleTeamLeaderClick(team)}
+                  title={`${team.name}\nLeader: ${leaderName}\n${leadsCount} total leads`}
+                  className={`p-1 px-2 rounded-lg border text-left flex items-center gap-1.5 transition-all shrink-0 ${
+                    isSelected
+                      ? 'bg-blue-50 text-blue-900 border-blue-500 ring-2 ring-blue-400/40 shadow-2xs font-bold'
+                      : 'bg-stone-50/80 hover:bg-stone-100 text-stone-700 border-stone-200 hover:border-stone-300'
+                  }`}
+                >
+                  <div className="relative shrink-0">
+                    <PersonAvatar
+                      name={leaderName}
+                      photo={leader?.photo || team.teamLeaderPhoto}
+                      size={24}
+                    />
+                    <span
+                      className={`absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full border border-white ${
+                        isSelected ? 'bg-blue-600' : 'bg-emerald-500'
+                      }`}
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] truncate font-semibold leading-tight">
+                      {shortName}
+                    </div>
+                    <div className="text-[9px] text-stone-500 font-normal truncate leading-tight">
+                      {firstName(leaderName)} ·{' '}
+                      <span className="text-blue-700 font-bold">{leadsCount}</span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="relative min-w-[170px] max-w-[220px] shrink-0">
+            <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search candidate, phone..."
+              className="w-full text-xs bg-stone-50/80 border border-stone-200 rounded-lg pl-7 pr-6 py-1 text-stone-800 placeholder-stone-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                title="Clear search"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 text-xs px-1"
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Row 2: callers */}
+        <div className="pt-2 border-t border-stone-100 flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-bold text-stone-700 flex items-center gap-1 shrink-0 mr-1">
+            <Users className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <span>
+              {currentTeam
+                ? `${squadLabel(currentTeam)} Telecallers (${displayExecutives.length}):`
+                : `All Telecallers (${displayExecutives.length}):`}
+            </span>
+          </span>
+
           <button
             type="button"
-            onClick={load}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-semibold text-stone-700 hover:bg-stone-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowReportPanel((p) => !p)}
-            className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 ${
-              showReportPanel
-                ? 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100'
-                : 'bg-blue-50 border-blue-300 text-blue-700'
+            onClick={() => setSelectedExecutiveId('All')}
+            title="View calls for all telecallers in this team"
+            className={`px-2 py-1 rounded-lg border flex items-center gap-1.5 transition-all text-left shrink-0 ${
+              selectedExecutiveId === 'All'
+                ? 'bg-blue-100 text-blue-900 border-blue-500 ring-2 ring-blue-400 font-bold shadow-2xs'
+                : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100 shadow-2xs'
             }`}
           >
-            {showReportPanel ? (
-              <>
-                <PanelRightClose className="w-3.5 h-3.5 text-stone-500" /> Hide Report
-              </>
-            ) : (
-              <>
-                <PanelRight className="w-3.5 h-3.5 text-blue-600" /> Show Report
-              </>
-            )}
+            <div className="w-4 h-4 rounded-full bg-stone-200 flex items-center justify-center text-stone-700 shrink-0">
+              <Users className="w-2.5 h-2.5" />
+            </div>
+            <span className="text-xs font-semibold">All Callers</span>
+            <span className="px-1.5 rounded-full text-[10px] font-mono font-bold bg-blue-100 text-blue-800 border border-blue-200 shrink-0">
+              {currentTeam
+                ? leads.filter((l) => sameId(l.assignedTeamId, currentTeam.id)).length
+                : leads.length}
+            </span>
           </button>
+
+          {displayExecutives.map((exec) => {
+            const isSelected = sameId(selectedExecutiveId, exec.id);
+            const leadCount = leads.filter(
+              (l) => sameId(l.assignedTelecallerId, exec.id) || sameId(l.followUpBy, exec.id)
+            ).length;
+
+            return (
+              <button
+                key={exec.id}
+                type="button"
+                onClick={() => setSelectedExecutiveId(isSelected ? 'All' : String(exec.id))}
+                title={`${exec.name} (${leadCount} leads)`}
+                className={`px-2 py-1 rounded-lg border flex items-center gap-1.5 transition-all text-left shrink-0 ${
+                  isSelected
+                    ? 'bg-blue-100 text-blue-900 border-blue-500 ring-2 ring-blue-400 font-bold shadow-2xs'
+                    : 'bg-stone-50 border-stone-200 text-stone-800 hover:bg-stone-100 shadow-2xs'
+                }`}
+              >
+                <PersonAvatar name={exec.name} photo={exec.photo} size="xs" />
+                <span className="text-xs font-semibold text-stone-800 truncate max-w-[120px]">
+                  {exec.name}
+                </span>
+                <span className="px-1.5 rounded-full text-[10px] font-mono font-bold bg-blue-100 text-blue-800 border border-blue-200 shrink-0">
+                  {leadCount} leads
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -285,537 +362,334 @@ export default function CallsTab({ counts = {}, refresh, onNavigate }) {
         </div>
       )}
 
-      {/* Filters + caller picker */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-        <div className="lg:col-span-7 bg-white p-3 rounded-lg border border-stone-200 shadow-2xs space-y-2.5">
-          <div className="flex items-center gap-2 bg-stone-50 px-2.5 py-1.5 rounded-md border border-stone-200">
-            <Search className="w-3.5 h-3.5 text-stone-400 shrink-0" />
-            <input
-              type="text"
-              placeholder="Search candidate name, phone, village..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent text-xs text-stone-800 placeholder-stone-400"
-            />
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap text-xs">
-            <select
-              value={teamFilter}
-              onChange={(e) => {
-                setTeamFilter(e.target.value);
-                setCallerFilter('All');
-              }}
-              className={selectClass}
-            >
-              <option value="All">All Teams</option>
-              {teams.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={callerFilter}
-              onChange={(e) => setCallerFilter(e.target.value)}
-              className={selectClass}
-            >
-              <option value="All">All Callers</option>
-              {visibleCallers.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-
-            <span className="text-[11px] text-stone-500 ml-auto">
-              {scoped.length} lead(s) in scope
-            </span>
-          </div>
-        </div>
-
-        {/* Quick pick callers */}
-        <div className="lg:col-span-5 bg-white p-3 rounded-lg border border-stone-200 shadow-2xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
-              Quick pick caller
-            </span>
-            {callerFilter !== 'All' && (
-              <button
-                type="button"
-                onClick={() => setCallerFilter('All')}
-                className="text-[10px] text-blue-600 hover:text-blue-800 font-semibold"
-              >
-                Reset
-              </button>
-            )}
-          </div>
-
-          {teamsLoading ? (
-            <div className="py-4 text-center">
-              <Loader2 className="w-4 h-4 animate-spin text-[#2563EB] mx-auto" />
-            </div>
-          ) : visibleCallers.length === 0 ? (
-            <p className="text-[11px] text-stone-400 py-3 text-center">
-              No callers in this squad yet.
-            </p>
-          ) : (
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-              <button
-                type="button"
-                onClick={() => setCallerFilter('All')}
-                className={`flex flex-col items-center gap-1 p-1.5 rounded-lg border transition-all ${
-                  callerFilter === 'All'
-                    ? 'bg-blue-50 border-blue-400 ring-1 ring-blue-300'
-                    : 'bg-stone-50/60 border-stone-200 hover:bg-stone-100'
-                }`}
-              >
-                <div className="w-9 h-9 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center">
-                  <Layers className="w-4 h-4" />
-                </div>
-                <span className="text-[9px] font-semibold text-stone-700 text-center leading-tight">
-                  All
-                </span>
-                <span className="text-[9px] font-bold text-[#2563EB]">{leads.length}</span>
-              </button>
-
-              {visibleCallers.map((caller) => {
-                const count = leads.filter(
-                  (l) => String(l.assigned_employee_id) === String(caller.id)
-                ).length;
-                const isActive = String(callerFilter) === String(caller.id);
-                return (
-                  <button
-                    key={caller.id}
-                    type="button"
-                    onClick={() =>
-                      setCallerFilter((prev) =>
-                        String(prev) === String(caller.id) ? 'All' : caller.id
-                      )
-                    }
-                    title={`${caller.name} · ${caller.teamName} · ${count} leads`}
-                    className={`flex flex-col items-center gap-1 p-1.5 rounded-lg border transition-all ${
-                      isActive
-                        ? 'bg-blue-50 border-blue-400 ring-1 ring-blue-300'
-                        : 'bg-stone-50/60 border-stone-200 hover:bg-stone-100'
+      {/* ── Queues ──────────────────────────────────────── */}
+      <div className="w-full space-y-3">
+        {/* Sub-tab navigation */}
+        <div className="flex flex-wrap items-center justify-between bg-stone-50 p-1.5 rounded-lg border border-stone-200 gap-2">
+          <div className="flex items-center gap-1 text-xs">
+            {SUB_TABS.map((tab) => {
+              const active = callsSubTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setCallsSubTab(tab.key)}
+                  className={`px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5 transition-all ${
+                    active
+                      ? 'bg-white text-stone-900 shadow-2xs border border-stone-200/80'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                >
+                  {tab.key === 'follow-ups' && <Clock className="w-3.5 h-3.5 text-amber-500" />}
+                  {tab.key === 'not-lifted' && (
+                    <PhoneForwarded className="w-3.5 h-3.5 text-red-500" />
+                  )}
+                  <span>{tab.label}</span>
+                  <span
+                    className={`px-1.5 rounded-full text-[10px] font-bold font-mono ${
+                      tab.key === 'first-calls'
+                        ? 'bg-blue-100 text-blue-700'
+                        : tab.key === 'follow-ups'
+                        ? 'bg-amber-100 text-amber-800'
+                        : tab.key === 'not-lifted'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-stone-200 text-stone-800'
                     }`}
                   >
-                    <PersonAvatar name={caller.name} photo={caller.photo} size={36} />
-                    <span className="text-[9px] font-semibold text-stone-700 text-center leading-tight line-clamp-2">
-                      {caller.name.split(' ')[0]}
-                    </span>
-                    <span
-                      className={`text-[9px] font-bold ${
-                        count > 0 ? 'text-[#2563EB]' : 'text-stone-400'
-                      }`}
-                    >
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Lifecycle grid */}
-      <div className="bg-white p-3 rounded-lg border border-stone-200 shadow-2xs space-y-2.5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold">
-              <Grid className="w-3.5 h-3.5" />
-            </div>
-            <div>
-              <span className="font-bold text-stone-900 text-xs">
-                Calling Lifecycle Operations Grid
-              </span>
-              <p className="text-[10px] text-stone-500">
-                Structured workflow stages: Ingestion → Dialing → Callback → Senior
-                escalation
-              </p>
-            </div>
+                    {countOf[tab.key]}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-          <span className="text-[10px] text-stone-500 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">
-            Interactive stage switcher
-          </span>
+
+          <div className="text-[11px] text-stone-500 hidden sm:flex items-center gap-1 pr-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>
+              Clicking <strong>CALL</strong> triggers the Agent Call Workspace
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
-          {STAGES.map((stage) => (
-            <StageCard
-              key={stage.key}
-              {...stage}
-              active={subTab === stage.key}
-              onClick={() =>
-                stage.navigate ? onNavigate?.(stage.navigate) : setSubTab(stage.key)
-              }
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
-        <div className={`${showReportPanel ? 'lg:col-span-9' : 'lg:col-span-12'} space-y-3`}>
-          {/* Follow-up sub-filter */}
-          {subTab === 'follow-ups' && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-2 flex flex-wrap items-center gap-2 text-xs">
-              <span className="font-bold text-amber-900">Call-backs due:</span>
+        {/* Follow-up date filter */}
+        {callsSubTab === 'follow-ups' && (
+          <div className="flex flex-wrap items-center justify-between gap-2 p-2 bg-amber-50/50 rounded-lg border border-amber-200/80 text-xs">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[11px] font-semibold text-amber-900 mr-1">Date Filter:</span>
               {[
-                { key: 'all', label: 'All' },
-                { key: 'today', label: 'Today' },
-                { key: 'tomorrow', label: 'Tomorrow' },
-                { key: 'custom', label: 'On date' },
+                { key: 'all', label: 'All Dates', on: 'bg-stone-900 text-white' },
+                { key: 'today', label: `Today (${todayStr})`, on: 'bg-blue-600 text-white' },
+                { key: 'tomorrow', label: `Tomorrow (${tomorrowStr})`, on: 'bg-blue-600 text-white' },
               ].map((f) => (
                 <button
                   key={f.key}
                   type="button"
                   onClick={() => setFollowUpFilter(f.key)}
-                  className={`px-2.5 py-1 rounded-lg font-semibold border transition-colors ${
+                  className={`px-2.5 py-1 rounded text-xs font-medium ${
                     followUpFilter === f.key
-                      ? 'bg-amber-600 border-amber-600 text-white'
-                      : 'bg-white border-amber-200 text-amber-900 hover:bg-amber-100'
+                      ? f.on
+                      : 'bg-white border border-stone-200 text-stone-700'
                   }`}
                 >
                   {f.label}
                 </button>
               ))}
-              {followUpFilter === 'custom' && (
+              <div className="flex items-center gap-1 bg-white border border-stone-200 rounded px-2 py-0.5">
+                <Calendar className="w-3 h-3 text-stone-400" />
                 <input
                   type="date"
-                  value={customDate}
-                  onChange={(e) => setCustomDate(e.target.value)}
-                  className="px-2 py-1 rounded-lg border border-amber-200 bg-white text-xs font-medium"
-                />
-              )}
-            </div>
-          )}
-
-          {/* Queue table */}
-          <div className="bg-white rounded-lg border border-stone-200 shadow-2xs overflow-hidden">
-            <div className="px-3 py-2 border-b border-stone-200 bg-stone-50/60 flex items-center justify-between">
-              <span className="text-xs font-bold text-stone-900">
-                {STAGES.find((s) => s.key === subTab)?.label || 'Queue'} ·{' '}
-                {activeQueue.length} lead(s)
-              </span>
-              {selectedCaller && (
-                <span className="text-[11px] text-stone-500">
-                  Filtered to {selectedCaller.name}
-                </span>
-              )}
-            </div>
-
-            <div className="overflow-x-auto max-h-[calc(100vh-560px)]">
-              <table className="w-full text-xs text-left">
-                <thead className="sticky top-0 z-20 shadow-2xs">
-                  <tr className="bg-stone-100 text-stone-700 font-semibold border-b border-stone-200">
-                    <th className="p-2.5 w-10 text-center bg-stone-100">Photo</th>
-                    <th className="p-2.5 bg-stone-100">Candidate name &amp; ID</th>
-                    <th className="p-2.5 bg-stone-100">Phone</th>
-                    <th className="p-2.5 bg-stone-100">Village / Mandal</th>
-                    <th className="p-2.5 bg-stone-100">Assigned caller &amp; team</th>
-                    <th className="p-2.5 bg-stone-100">Last outcome</th>
-                    <th className="p-2.5 text-right w-20 bg-stone-100">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {loading ? (
-                    <tr>
-                      <td colSpan={7} className="p-10 text-center text-stone-400">
-                        <span className="inline-flex items-center gap-2 font-medium">
-                          <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" /> Loading…
-                        </span>
-                      </td>
-                    </tr>
-                  ) : activeQueue.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="p-8 text-center text-stone-400">
-                        Nothing in this queue.
-                      </td>
-                    </tr>
-                  ) : (
-                    activeQueue.map((lead) => {
-                      const caller = employeeById.get(String(lead.assigned_employee_id));
-                      return (
-                        <tr key={lead.id} className="hover:bg-stone-50 transition-colors">
-                          <td className="p-2 text-center">
-                            {lead.photo ? (
-                              <img
-                                src={lead.photo}
-                                alt={lead.name}
-                                className="w-7 h-7 rounded-full object-cover mx-auto"
-                              />
-                            ) : (
-                              <div className="w-7 h-7 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center mx-auto">
-                                <UserRound className="w-3.5 h-3.5" />
-                              </div>
-                            )}
-                          </td>
-
-                          <td className="p-2.5">
-                            <div className="font-semibold text-stone-900">{lead.name}</div>
-                            <div className="text-[10px] text-stone-400">
-                              LD-{String(lead.id).padStart(4, '0')}
-                              {Number(lead.call_attempts) > 0 && (
-                                <> · {lead.call_attempts} attempt(s)</>
-                              )}
-                            </div>
-                          </td>
-
-                          <td className="p-2.5 text-stone-700">{lead.phone}</td>
-
-                          <td className="p-2.5">
-                            <div className="text-stone-800 font-medium">
-                              {lead.village || '—'}
-                            </div>
-                            <div className="text-[10px] text-stone-500">
-                              {lead.mandal || '—'}
-                            </div>
-                          </td>
-
-                          <td className="p-2.5">
-                            {caller ? (
-                              <div className="flex items-center gap-1.5">
-                                <PersonAvatar name={caller.name} photo={caller.photo} size="xs" />
-                                <div className="min-w-0">
-                                  <div className="text-stone-800 font-medium truncate">
-                                    {caller.name}
-                                  </div>
-                                  <div className="text-[10px] text-stone-400 truncate">
-                                    {lead.assigned_team_name || '—'}
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="px-1.5 py-0.5 rounded bg-blue-50 text-[#2563EB] text-[10px] font-bold border border-blue-200">
-                                Unallotted
-                              </span>
-                            )}
-                          </td>
-
-                          <td className="p-2.5">
-                            {lead.last_call_status ? (
-                              <div>
-                                <div className="text-stone-700 font-medium">
-                                  {lead.last_call_status}
-                                </div>
-                                {lead.follow_up_date && (
-                                  <div className="text-[10px] text-amber-700 font-semibold">
-                                    Call back {lead.follow_up_date}
-                                    {lead.follow_up_time ? ` · ${lead.follow_up_time}` : ''}
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-stone-400">Never called</span>
-                            )}
-                          </td>
-
-                          <td className="p-2.5 text-right">
-                            <button
-                              type="button"
-                              onClick={() => setCallLead(lead)}
-                              className="px-2.5 py-1 rounded bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-xs inline-flex items-center gap-1 shadow-2xs"
-                            >
-                              <Phone className="w-3 h-3" />
-                              Call
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="px-3 py-2 border-t border-stone-200 bg-stone-50/60 text-[11px] text-stone-500">
-              Recording an outcome moves the lead on: Proceed → Interested, Follow up →
-              call-back queue, Not interested → closed.
-            </div>
-          </div>
-        </div>
-
-        {/* Report panel */}
-        {showReportPanel && (
-          <div className="lg:col-span-3 space-y-3 lg:sticky lg:top-0 lg:self-start">
-            <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-2xs space-y-2.5">
-              <div className="border-b border-stone-100 pb-1.5 flex items-center justify-between">
-                <h3 className="text-xs font-bold text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
-                  <span className="truncate">Conversion Report</span>
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setShowReportPanel(false)}
-                  className="p-1 rounded text-stone-400 hover:text-stone-700 hover:bg-stone-100"
-                >
-                  <PanelRightClose className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Who the report is about */}
-              <div className="flex items-center gap-2 p-2 bg-stone-50 border border-stone-200 rounded-lg">
-                {selectedCaller ? (
-                  <>
-                    <PersonAvatar
-                      name={selectedCaller.name}
-                      photo={selectedCaller.photo}
-                      size="md"
-                    />
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-stone-900 truncate">
-                        {selectedCaller.name}
-                      </div>
-                      <div className="text-[10px] text-stone-500">
-                        {selectedCaller.teamName} ·{' '}
-                        {report.perf ? `${report.perf.connect_rate}% connect` : 'no calls yet'}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="w-9 h-9 rounded-full bg-blue-50 text-[#2563EB] border border-blue-200 flex items-center justify-center">
-                      <Layers className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-stone-900">
-                        Whole department
-                      </div>
-                      <div className="text-[10px] text-stone-500">
-                        Pick a caller to scope this
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Rates */}
-              <div className="grid grid-cols-2 gap-2">
-                <RateCard
-                  label="Interested rate"
-                  value={`${report.interestedRate}%`}
-                  sub={`${report.interested} of ${report.connected} connected`}
-                  tone="blue"
-                />
-                <RateCard
-                  label="Onboarded rate"
-                  value={`${report.onboardedRate}%`}
-                  sub={`${report.joined} joined`}
-                  tone="emerald"
+                  value={followUpCustomDate}
+                  onChange={(e) => {
+                    setFollowUpCustomDate(e.target.value);
+                    setFollowUpFilter('custom');
+                  }}
+                  className="text-xs bg-transparent"
                 />
               </div>
-
-              {/* Funnel */}
-              <div className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
-                  Conversion funnel
-                </span>
-                {[
-                  { label: 'Allotted leads', value: report.allotted, tone: 'bg-stone-400' },
-                  { label: 'Connected calls', value: report.connected, tone: 'bg-blue-500' },
-                  { label: 'Interested', value: report.interested, tone: 'bg-emerald-500' },
-                  { label: 'Joined as agent', value: report.joined, tone: 'bg-emerald-700' },
-                ].map((step) => {
-                  const base = Math.max(1, report.allotted);
-                  return (
-                    <div key={step.label}>
-                      <div className="flex justify-between text-[11px] font-semibold text-stone-700 mb-0.5">
-                        <span>{step.label}</span>
-                        <strong className="text-stone-900">{step.value}</strong>
-                      </div>
-                      <div className="w-full bg-stone-100 h-1.5 rounded-full overflow-hidden">
-                        <div
-                          className={`${step.tone} h-1.5 rounded-full transition-all`}
-                          style={{ width: `${Math.min(100, (step.value / base) * 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {report.perf && (
-                <div className="p-2 bg-blue-50 border border-blue-200 rounded-lg text-[11px] space-y-0.5">
-                  <div className="flex justify-between">
-                    <span className="text-stone-600">Attempts</span>
-                    <strong className="text-stone-900">{report.perf.attempts}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-stone-600">Answered</span>
-                    <strong className="text-stone-900">{report.perf.answered}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-stone-600">Proceeded</span>
-                    <strong className="text-emerald-700">{report.perf.proceeded}</strong>
-                  </div>
-                </div>
-              )}
             </div>
+
+            <span className="text-[11px] text-amber-800 font-medium">
+              {followUpsQueue.length} follow-up calls scheduled
+            </span>
           </div>
         )}
-      </div>
 
-      {callLead && (
-        <CallWorkspaceModal
-          lead={callLead}
-          queue={subTab === 'all' ? 'first-call' : subTab.replace(/s$/, '')}
-          onClose={() => setCallLead(null)}
-          onDone={() => {
-            load();
-            refresh?.();
-          }}
-        />
-      )}
-    </div>
-  );
-}
+        {/* Table */}
+        <div className="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-2xs">
+          <div className="p-2.5 bg-stone-50 border-b border-stone-200 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-stone-800">{STRIP_TITLES[callsSubTab]}</span>
+              <span className="px-2 rounded-full text-[10px] font-mono font-bold bg-white text-stone-700 border border-stone-200">
+                {currentDisplayedLeads.length} Candidates
+              </span>
+            </div>
 
-/* ── Local pieces ─────────────────────────────────────────────── */
+            {selectedExecutive && (
+              <div className="flex items-center gap-1.5 text-stone-500 text-[11px]">
+                <span>Caller:</span>
+                <span className="font-semibold text-blue-700">{selectedExecutive.name}</span>
+              </div>
+            )}
+          </div>
 
-const STAGE_TONES = {
-  blue: { on: 'bg-blue-600 border-blue-600 text-white', off: 'bg-blue-50/60 border-blue-200 text-blue-900' },
-  amber: { on: 'bg-amber-600 border-amber-600 text-white', off: 'bg-amber-50/60 border-amber-200 text-amber-900' },
-  rose: { on: 'bg-rose-600 border-rose-600 text-white', off: 'bg-rose-50/60 border-rose-200 text-rose-900' },
-  purple: { on: 'bg-purple-600 border-purple-600 text-white', off: 'bg-purple-50/60 border-purple-200 text-purple-900' },
-  stone: { on: 'bg-stone-800 border-stone-800 text-white', off: 'bg-stone-50/60 border-stone-200 text-stone-800' },
-};
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead>
+                <tr className="bg-stone-50 text-stone-600 font-semibold border-b border-stone-200">
+                  <th className="p-2.5 w-10 text-center">Photo</th>
+                  <th className="p-2.5">Candidate Name &amp; ID</th>
+                  <th className="p-2.5">Phone</th>
+                  <th className="p-2.5">Village / Mandal</th>
+                  <th className="p-2.5">Assigned Caller &amp; Team</th>
+                  <th className="p-2.5">
+                    {callsSubTab === 'follow-ups'
+                      ? 'Follow-up Time & Date'
+                      : callsSubTab === 'not-lifted'
+                      ? 'Attempts & Last Time'
+                      : 'Call Status / Notes'}
+                  </th>
+                  <th className="p-2.5 text-right w-28">Action</th>
+                </tr>
+              </thead>
 
-function StageCard({ label, sub, icon: Icon, count, tone, active, onClick }) {
-  const tones = STAGE_TONES[tone] || STAGE_TONES.stone;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`p-2.5 rounded-lg border transition-all flex flex-col justify-between text-left ${
-        active ? tones.on : `${tones.off} hover:brightness-95`
-      }`}
-    >
-      <div className="flex items-center justify-between gap-1">
-        <Icon className="w-3.5 h-3.5 shrink-0" />
-        <span className="text-lg font-black leading-none">{count}</span>
-      </div>
-      <div className="mt-1.5">
-        <div className="text-[11px] font-bold leading-tight">{label}</div>
-        <div className={`text-[9px] leading-tight ${active ? 'opacity-80' : 'opacity-70'}`}>
-          {sub}
+              <tbody className="divide-y divide-stone-100">
+                {loading || rosterLoading ? (
+                  <tr>
+                    <td colSpan={7} className="p-10 text-center text-stone-400">
+                      <span className="inline-flex items-center gap-2 font-medium">
+                        <Loader2 className="w-4 h-4 animate-spin text-[#2563EB]" /> Loading…
+                      </span>
+                    </td>
+                  </tr>
+                ) : currentDisplayedLeads.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-10 text-center">
+                      <div className="max-w-sm mx-auto space-y-2">
+                        <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
+                        <p className="font-semibold text-stone-800 text-sm">
+                          No pending calls in this queue!
+                        </p>
+                        <p className="text-xs text-stone-500">{EMPTY_HINTS[callsSubTab]}</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  currentDisplayedLeads.map((lead) => {
+                    const assignedEmp = lead.assignedTelecallerId
+                      ? employeeById.get(String(lead.assignedTelecallerId))
+                      : null;
+                    const callerName = assignedEmp?.name || lead.assignedTelecallerName;
+
+                    return (
+                      <tr key={lead.id} className="hover:bg-blue-50/30 transition-colors">
+                        <td className="p-2 text-center">
+                          <PersonAvatar
+                            photo={lead.photo}
+                            name={lead.name}
+                            size={30}
+                            className="mx-auto"
+                          />
+                        </td>
+
+                        <td className="p-2.5">
+                          <div className="flex flex-col">
+                            <button
+                              type="button"
+                              onClick={() => openLead(lead)}
+                              className="font-bold text-stone-900 hover:text-blue-600 transition-colors text-left flex items-center gap-1"
+                            >
+                              <span>{lead.name}</span>
+                              <ExternalLink className="w-2.5 h-2.5 text-stone-400" />
+                            </button>
+                            <span className="text-[10px] font-mono text-stone-400">
+                              {lead.code}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="p-2.5">
+                          <span className="font-mono text-stone-700 font-medium">{lead.phone}</span>
+                        </td>
+
+                        <td className="p-2.5 text-stone-800">
+                          <span className="font-medium text-stone-900 block truncate max-w-[130px]">
+                            {lead.nativeVillage || '—'}
+                          </span>
+                          <span className="text-[10px] text-stone-500 block truncate max-w-[130px]">
+                            {lead.mandal ? `${lead.mandal}, ` : ''}
+                            {lead.district}
+                          </span>
+                        </td>
+
+                        <td className="p-2.5">
+                          <div className="flex items-center gap-1.5">
+                            <PersonAvatar
+                              name={callerName || 'Unassigned'}
+                              photo={assignedEmp?.photo}
+                              size="xs"
+                            />
+                            <div className="min-w-0">
+                              <span className="font-medium text-stone-900 block truncate text-[11px]">
+                                {callerName || 'Unassigned'}
+                              </span>
+                              <span className="text-[9.5px] text-stone-500 block truncate">
+                                {lead.assignedTeamName
+                                  ? squadLabel({ name: lead.assignedTeamName })
+                                  : 'Unattached'}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="p-2.5 text-stone-600">
+                          {callsSubTab === 'follow-ups' ? (
+                            <div>
+                              <div className="flex items-center gap-1">
+                                <span
+                                  className={`px-1.5 rounded text-[10px] font-semibold ${
+                                    lead.followUpDate === todayStr
+                                      ? 'bg-amber-100 text-amber-900 border border-amber-200'
+                                      : 'bg-stone-100 text-stone-700'
+                                  }`}
+                                >
+                                  {lead.followUpDate}
+                                </span>
+                                <span className="text-[10px] text-stone-500 font-medium">
+                                  {lead.followUpTime || '10:00 AM'}
+                                </span>
+                              </div>
+                              <span className="text-[10.5px] text-stone-500 block truncate max-w-[160px] mt-0.5">
+                                {lead.lastCallNote || 'Follow-up scheduled'}
+                              </span>
+                            </div>
+                          ) : callsSubTab === 'not-lifted' ? (
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="px-1.5 rounded-full text-[10px] font-mono font-bold bg-red-100 text-red-700">
+                                  {lead.callAttempts || 1}x attempts
+                                </span>
+                                <span className="text-[10px] text-stone-500">
+                                  {lead.lastAttemptTime || 'Earlier today'}
+                                </span>
+                              </div>
+                              <span className="text-[10.5px] text-stone-500 block truncate max-w-[160px] mt-0.5">
+                                {lead.lastCallNote || 'Rang unanswered'}
+                              </span>
+                            </div>
+                          ) : (
+                            <div>
+                              {lead.lastCallStatus ? (
+                                <span
+                                  className={`inline-block px-1.5 rounded text-[10px] font-medium ${
+                                    lead.lastCallStatus === 'Answered'
+                                      ? 'bg-emerald-100 text-emerald-800'
+                                      : lead.lastCallStatus === 'Not Lifted'
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-amber-100 text-amber-800'
+                                  }`}
+                                >
+                                  {lead.lastCallStatus}
+                                </span>
+                              ) : (
+                                <span className="px-1.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                  Fresh Inquiry
+                                </span>
+                              )}
+                              <span className="text-[10.5px] text-stone-500 block truncate max-w-[160px] mt-0.5">
+                                {lead.lastCallNote || 'Pending initial contact'}
+                              </span>
+                            </div>
+                          )}
+                        </td>
+
+                        <td className="p-2.5 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => callLead(lead, queueOf(callsSubTab, lead))}
+                              title="Call Candidate (Open Call Workspace)"
+                              className="px-2.5 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs inline-flex items-center gap-1 shadow-2xs transition-colors"
+                            >
+                              <Phone className="w-3 h-3" />
+                              <span>CALL</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => openLead(lead)}
+                              title="View Candidate Details"
+                              className="p-1 rounded text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="p-2.5 bg-stone-50 border-t border-stone-200 flex items-center justify-between text-xs text-stone-500">
+            <span>
+              Showing leads: <strong>{currentDisplayedLeads.length}</strong> / Total Scope:{' '}
+              {scopedLeads.length}
+            </span>
+            <div className="flex items-center gap-3">
+              <span>
+                First Calls: <strong className="text-blue-700">{firstCallsQueue.length}</strong>
+              </span>
+              <span>
+                Follow-ups: <strong className="text-amber-700">{followUpsQueue.length}</strong>
+              </span>
+              <span>
+                Not Lifted: <strong className="text-red-700">{notLiftedQueue.length}</strong>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
-    </button>
-  );
-}
-
-function RateCard({ label, value, sub, tone }) {
-  const tones = {
-    blue: 'bg-blue-50 border-blue-200 text-blue-900',
-    emerald: 'bg-emerald-50 border-emerald-200 text-emerald-900',
-  };
-  return (
-    <div className={`p-2 rounded-lg border ${tones[tone]}`}>
-      <div className="text-[9px] font-bold uppercase tracking-wider opacity-70">{label}</div>
-      <div className="text-lg font-black leading-none mt-1">{value}</div>
-      <div className="text-[9px] opacity-70 mt-0.5">{sub}</div>
     </div>
   );
 }

@@ -235,7 +235,7 @@ export default function CrewCadresTab() {
 
                       <td className="p-2.5 text-stone-700">
                         {emp.role || '—'}
-                        {emp.secondary_role && (
+                        {typeof emp.secondary_role === 'string' && emp.secondary_role && (
                           <div className="text-[10px] text-stone-400">
                             {emp.secondary_role}
                           </div>

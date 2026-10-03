@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Search,
   Plus,
-  Layers,
   Filter,
   Building2,
   TrendingUp,
@@ -10,10 +9,11 @@ import {
   PanelRightClose,
   CheckCircle2,
   Check,
-  Phone,
   Loader2,
   AlertTriangle,
-  UserRound,
+  RotateCcw,
+  CheckSquare,
+  Square,
 } from 'lucide-react';
 import {
   LineChart,
@@ -27,31 +27,34 @@ import {
 
 import PersonAvatar from '../common/PersonAvatar';
 import GraphXAxisPhotoTick from '../common/GraphXAxisPhotoTick';
-import AddLeadModal from './AddLeadModal';
-import AddMultipleLeadsModal from './AddMultipleLeadsModal';
-import CallWorkspaceModal from './CallWorkspaceModal';
-import useAgentTeams from '../../../hooks/useAgentTeams';
+import AddLeadsModal from './AddLeadsModal';
+import { useRecruitmentDesk } from '../../../hooks/useRecruitmentDesk';
+import { squadLabel, firstName, sameId } from './recruitmentModel';
+import useAgentLeads from '../../../hooks/useAgentLeads';
 import agentLeadService from '../../../services/agentLeadService';
-import {
-  LEAD_SOURCES,
-  LEAD_SOURCE_TONES as SOURCE_TONES,
-  normaliseLeadSource,
-} from '../agentConstants';
+import { LEAD_SOURCES, LEAD_SOURCE_TONES as SOURCE_TONES } from '../agentConstants';
+import { errorMessage } from '../../../utils/apiErrors';
+
+const selectClass =
+  'px-2 py-1 bg-stone-50 rounded border border-stone-200 text-xs font-medium text-stone-700 focus:bg-white';
 
 /**
  * Level 1 of the recruitment desk: every live lead, and which squad it belongs
  * to.
  *
- * Attaching is done inline — one avatar per squad on every row, click to
- * attach, click again to detach. That is the whole job of this page; dialling
- * happens in Calls, distribution to individual callers in Allot Leads.
+ * Attaching is done inline — one avatar per squad on every row, click to attach,
+ * click again to detach — or in bulk from the bar that appears once rows are
+ * ticked. That is the whole job of this page; dialling happens in Calls and
+ * distribution to individual callers in Allot Leads.
+ *
+ * Attaching gives a lead a squad and *no caller*: it then waits in that squad's
+ * Allot Leads pool. (An earlier version passed the team leader as the caller,
+ * which made every attached lead look already allotted.)
  */
-export default function LeadsTab({ refresh }) {
-  const { teams, employeeById, loading: teamsLoading } = useAgentTeams();
-
-  const [leads, setLeads] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export default function LeadsTab() {
+  const { teams, employeeById, rosterLoading, rosterError, notifyChanged, openLead } =
+    useRecruitmentDesk();
+  const { leads, loading, error: loadError } = useAgentLeads();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [districtFilter, setDistrictFilter] = useState('All');
@@ -59,47 +62,28 @@ export default function LeadsTab({ refresh }) {
   const [sourceFilter, setSourceFilter] = useState('All');
   const [teamFilter, setTeamFilter] = useState('All');
 
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(true);
   const [showTeamsLineGraph, setShowTeamsLineGraph] = useState(true);
 
-  const [showAddLead, setShowAddLead] = useState(false);
-  const [showAddMultiple, setShowAddMultiple] = useState(false);
+  const [showAddLeads, setShowAddLeads] = useState(false);
+  const [notice, setNotice] = useState(null);
+  const [actionError, setActionError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [attachingId, setAttachingId] = useState(null);
 
-  // The shell`s universal Quick Add routes here and then asks this tab to open
+  // The shell's universal Quick Add routes here and then asks this tab to open
   // its own create form, so the two stay in step without the shell needing to
   // know anything about lead fields.
   useEffect(() => {
     const onQuickAdd = (e) => {
-      if (e.detail?.type === "agent") setShowAddLead(true);
+      if (e.detail?.type === 'agent') setShowAddLeads(true);
     };
-    window.addEventListener("garuda:quick-add", onQuickAdd);
-    return () => window.removeEventListener("garuda:quick-add", onQuickAdd);
-  }, []);
-  const [callLead, setCallLead] = useState(null);
-  const [notice, setNotice] = useState(null);
-  const [attachingId, setAttachingId] = useState(null);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await agentLeadService.getLeads({});
-      const list = data.result || data.data || [];
-      setLeads(Array.isArray(list) ? list : []);
-      setError(null);
-    } catch (err) {
-      console.error('Failed to load leads:', err);
-      setLeads([]);
-      setError('Could not load the lead pipeline.');
-    } finally {
-      setLoading(false);
-    }
+    window.addEventListener('garuda:quick-add', onQuickAdd);
+    return () => window.removeEventListener('garuda:quick-add', onQuickAdd);
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  // Toast clears itself; it is confirmation, not something to dismiss.
+  // The toast is confirmation, not something to dismiss.
   useEffect(() => {
     if (!notice) return undefined;
     const timer = setTimeout(() => setNotice(null), 3000);
@@ -109,13 +93,11 @@ export default function LeadsTab({ refresh }) {
   /* ── Distribution ─────────────────────────────────────────── */
 
   const distribution = useMemo(() => {
-    const unattached = leads.filter((l) => !l.assigned_team_id).length;
+    const unattached = leads.filter((l) => !l.assignedTeamId).length;
     const teamStats = teams.map((team) => ({
       team,
       leader: employeeById.get(String(team.teamLeaderId)),
-      teamLeadCount: leads.filter(
-        (l) => String(l.assigned_team_id) === String(team.id)
-      ).length,
+      teamLeadCount: leads.filter((l) => sameId(l.assignedTeamId, team.id)).length,
     }));
 
     return {
@@ -131,7 +113,7 @@ export default function LeadsTab({ refresh }) {
       distribution.teamStats.map(({ team, teamLeadCount, leader }) => ({
         name: team.shortName,
         fullName: team.name,
-        leader: (leader?.name || team.teamLeaderName).split(' ')[0],
+        leader: firstName(leader?.name || team.teamLeaderName),
         photo: leader?.photo || team.teamLeaderPhoto || '',
         leads: teamLeadCount,
         teamId: team.id,
@@ -147,12 +129,14 @@ export default function LeadsTab({ refresh }) {
   );
   const mandals = useMemo(
     () =>
-      [...new Set(
-        leads
-          .filter((l) => districtFilter === 'All' || l.district === districtFilter)
-          .map((l) => l.mandal)
-          .filter(Boolean)
-      )].sort(),
+      [
+        ...new Set(
+          leads
+            .filter((l) => districtFilter === 'All' || l.district === districtFilter)
+            .map((l) => l.mandal)
+            .filter(Boolean)
+        ),
+      ].sort(),
     [leads, districtFilter]
   );
 
@@ -161,63 +145,110 @@ export default function LeadsTab({ refresh }) {
     return leads.filter((lead) => {
       const matchesSearch =
         !q ||
-        String(lead.name || '').toLowerCase().includes(q) ||
-        String(lead.phone || '').includes(q) ||
-        String(lead.village || '').toLowerCase().includes(q);
-
+        lead.name.toLowerCase().includes(q) ||
+        lead.phone.includes(q) ||
+        lead.nativeVillage.toLowerCase().includes(q);
       if (!matchesSearch) return false;
+
       if (districtFilter !== 'All' && lead.district !== districtFilter) return false;
       if (mandalFilter !== 'All' && lead.mandal !== mandalFilter) return false;
-      if (sourceFilter !== 'All' && normaliseLeadSource(lead.lead_source) !== sourceFilter)
-        return false;
+      if (sourceFilter !== 'All' && lead.source !== sourceFilter) return false;
 
-      if (teamFilter === 'Unattached') return !lead.assigned_team_id;
-      if (teamFilter !== 'All')
-        return String(lead.assigned_team_id) === String(teamFilter);
-
+      if (teamFilter === 'Unattached') return !lead.assignedTeamId;
+      if (teamFilter !== 'All') return sameId(lead.assignedTeamId, teamFilter);
       return true;
     });
   }, [leads, searchQuery, districtFilter, mandalFilter, sourceFilter, teamFilter]);
 
+  const hasActiveFilters =
+    teamFilter !== 'All' ||
+    sourceFilter !== 'All' ||
+    districtFilter !== 'All' ||
+    mandalFilter !== 'All' ||
+    Boolean(searchQuery);
+
+  const resetFilters = () => {
+    setTeamFilter('All');
+    setSourceFilter('All');
+    setDistrictFilter('All');
+    setMandalFilter('All');
+    setSearchQuery('');
+  };
+
+  /* ── Selection ────────────────────────────────────────────── */
+
+  const allInViewSelected =
+    filteredLeads.length > 0 && filteredLeads.every((l) => selectedIds.has(l.id));
+  const someSelected = selectedIds.size > 0;
+
+  const toggleSelectAll = () =>
+    setSelectedIds(allInViewSelected ? new Set() : new Set(filteredLeads.map((l) => l.id)));
+
+  const toggleSelectLead = (id) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
   /* ── Attach / detach ──────────────────────────────────────── */
 
+  const attach = (leadIds, team) =>
+    agentLeadService.allot({
+      leadIds,
+      // No employeeId: the lead gets a squad and waits there for a caller.
+      teamId: Number(team.id),
+      teamLeaderId: Number(team.teamLeaderId),
+      teamName: team.name,
+    });
+
   const handleToggleTeam = async (lead, team) => {
-    const isAttached = String(lead.assigned_team_id) === String(team.id);
+    const isAttached = sameId(lead.assignedTeamId, team.id);
     setAttachingId(lead.id);
-    setError(null);
+    setActionError(null);
     try {
       if (isAttached) {
-        // Detaching returns it to the unallotted pool, which clears the
+        // Detaching returns it to the unattached pool, which clears the
         // telecaller too — a lead cannot belong to a caller but no squad.
         await agentLeadService.unallot([lead.id]);
         setNotice(`${lead.name} detached from ${team.name}.`);
       } else {
-        await agentLeadService.allot({
-          leadIds: [lead.id],
-          employeeId: Number(team.teamLeaderId),
-          teamLeaderId: Number(team.teamLeaderId),
-          teamId: Number(team.id),
-          teamName: team.name,
-        });
+        await attach([lead.id], team);
         setNotice(`${lead.name} attached to ${team.name}.`);
       }
-      await load();
-      refresh?.();
+      notifyChanged();
     } catch (err) {
-      setError(err.response?.data?.message || 'Could not change the squad attachment.');
+      setActionError(errorMessage(err, 'Could not change the squad attachment.'));
     } finally {
       setAttachingId(null);
     }
   };
 
-  const selectClass =
-    'px-2 py-1 bg-stone-50 rounded border border-stone-200 text-xs font-medium text-stone-700 focus:bg-white';
+  const handleAttachSelected = async (team) => {
+    if (!someSelected) return;
+    const ids = [...selectedIds];
+    setBusy(true);
+    setActionError(null);
+    try {
+      await attach(ids, team);
+      setNotice(`${ids.length} lead${ids.length === 1 ? '' : 's'} attached to ${team.name}.`);
+      setSelectedIds(new Set());
+      notifyChanged();
+    } catch (err) {
+      setActionError(errorMessage(err, 'Could not attach the selected leads.'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const error = actionError || loadError || rosterError;
 
   return (
     <div className="space-y-4">
       {/* Floating toast — fixed, so it never shifts the table */}
       {notice && (
-        <div className="fixed bottom-5 right-5 z-50 px-4 py-2.5 bg-stone-900 text-white rounded-lg text-xs font-semibold flex items-center gap-2.5 shadow-xl border border-stone-700">
+        <div className="fixed bottom-5 right-5 z-[1300] px-4 py-2.5 bg-stone-900 text-white rounded-lg text-xs font-semibold flex items-center gap-2.5 shadow-xl border border-stone-700">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{notice}</span>
           <button
@@ -262,7 +293,7 @@ export default function LeadsTab({ refresh }) {
                 <button
                   type="button"
                   onClick={() => setIsSidePanelOpen((p) => !p)}
-                  title={isSidePanelOpen ? 'Hide graph panel' : 'Show graph panel'}
+                  title={isSidePanelOpen ? 'Hide Graph Panel' : 'Show Graph Panel'}
                   className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-all ${
                     isSidePanelOpen
                       ? 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100'
@@ -284,18 +315,12 @@ export default function LeadsTab({ refresh }) {
 
                 <button
                   type="button"
-                  onClick={() => setShowAddLead(true)}
+                  onClick={() => setShowAddLeads(true)}
+                  title="Add candidate leads into calling pipeline"
                   className="px-3 py-1.5 rounded bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-xs flex items-center gap-1.5 shadow-2xs transition-colors"
                 >
-                  <Plus className="w-3.5 h-3.5" />+ Add Lead
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowAddMultiple(true)}
-                  className="px-3 py-1.5 rounded bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs flex items-center gap-1.5 shadow-2xs transition-colors"
-                >
-                  <Layers className="w-3.5 h-3.5 text-blue-400" />+ Add Multiple
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Leads
                 </button>
               </div>
             </div>
@@ -363,6 +388,16 @@ export default function LeadsTab({ refresh }) {
                   </option>
                 ))}
               </select>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="text-[11px] text-blue-600 hover:text-blue-800 font-medium ml-auto flex items-center gap-1"
+                >
+                  <RotateCcw className="w-3 h-3" /> Reset Filters
+                </button>
+              )}
             </div>
           </div>
 
@@ -372,12 +407,72 @@ export default function LeadsTab({ refresh }) {
             </div>
           )}
 
+          {/* Batch bar — only while something is ticked */}
+          {someSelected && (
+            <div className="p-2 px-3 rounded-lg bg-blue-50 border border-blue-300 flex items-center justify-between gap-2 shadow-2xs">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded bg-blue-600 text-white font-bold text-xs flex items-center gap-1 shadow-2xs">
+                  <CheckSquare className="w-3.5 h-3.5" />
+                  {selectedIds.size} Selected
+                </span>
+                <span className="text-stone-600 text-xs font-medium">Attach to:</span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {teams.map((team) => {
+                    const leader = employeeById.get(String(team.teamLeaderId));
+                    return (
+                      <button
+                        key={team.id}
+                        type="button"
+                        disabled={busy}
+                        onClick={() => handleAttachSelected(team)}
+                        title={`Attach ${selectedIds.size} lead(s) to ${team.name}`}
+                        className="inline-flex items-center gap-1.5 pl-1 pr-2.5 py-0.5 rounded-full bg-white hover:bg-blue-600 hover:text-white text-stone-800 border border-stone-200 text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50"
+                      >
+                        <PersonAvatar
+                          name={leader?.name || team.teamLeaderName}
+                          photo={leader?.photo || team.teamLeaderPhoto}
+                          size="xs"
+                        />
+                        <span>{squadLabel(team)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set())}
+                className="text-xs text-stone-500 hover:text-stone-800 underline font-medium"
+              >
+                Deselect all
+              </button>
+            </div>
+          )}
+
           {/* Table */}
-          <div className="bg-white rounded-lg border border-stone-200 shadow-2xs overflow-hidden">
-            <div className="overflow-x-auto max-h-[calc(100vh-420px)]">
+          <div className="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-2xs">
+            <div className="overflow-x-auto max-h-[calc(100vh-230px)] overflow-y-auto">
               <table className="w-full text-xs text-left">
                 <thead className="sticky top-0 z-20 shadow-2xs">
                   <tr className="bg-stone-100 text-stone-700 font-semibold border-b border-stone-200 select-none">
+                    <th className="p-2.5 w-10 text-center bg-stone-100">
+                      <button
+                        type="button"
+                        onClick={toggleSelectAll}
+                        className="p-1 hover:bg-stone-200 rounded text-stone-600"
+                        title={allInViewSelected ? 'Deselect all' : 'Select all'}
+                      >
+                        {allInViewSelected ? (
+                          <CheckSquare className="w-4 h-4 text-blue-600" />
+                        ) : someSelected ? (
+                          <div className="w-4 h-4 bg-blue-600 text-white rounded flex items-center justify-center text-[10px] font-bold">
+                            -
+                          </div>
+                        ) : (
+                          <Square className="w-4 h-4 text-stone-400" />
+                        )}
+                      </button>
+                    </th>
                     <th className="p-2.5 w-10 text-center bg-stone-100">Photo</th>
                     <th className="p-2.5 bg-stone-100">Name</th>
                     <th className="p-2.5 bg-stone-100">Phone</th>
@@ -386,14 +481,13 @@ export default function LeadsTab({ refresh }) {
                     <th className="p-2.5 bg-stone-100">District</th>
                     <th className="p-2.5 bg-stone-100">Source</th>
                     <th className="p-2.5 text-center bg-stone-100 min-w-[240px] w-64">
-                      Attach to Team ({teams.length} Squad{teams.length === 1 ? '' : 's'})
+                      Attach to Team ({teams.length} {teams.length === 1 ? 'Team' : 'Teams'})
                     </th>
-                    <th className="p-2.5 text-right w-16 bg-stone-100">Call</th>
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-stone-100">
-                  {loading || teamsLoading ? (
+                  {loading || rosterLoading ? (
                     <tr>
                       <td colSpan={9} className="p-10 text-center text-stone-400">
                         <span className="inline-flex items-center gap-2 font-medium">
@@ -405,132 +499,141 @@ export default function LeadsTab({ refresh }) {
                   ) : filteredLeads.length === 0 ? (
                     <tr>
                       <td colSpan={9} className="p-8 text-center text-stone-400">
-                        No leads match these filters.
+                        No agent leads found matching current search or filters.
                       </td>
                     </tr>
                   ) : (
-                    filteredLeads.map((lead) => (
-                      <tr key={lead.id} className="hover:bg-stone-50 transition-colors">
-                        <td className="p-2 text-center">
-                          {lead.photo ? (
-                            <img
-                              src={lead.photo}
-                              alt={lead.name}
-                              className="w-7 h-7 rounded-full object-cover mx-auto"
-                            />
-                          ) : (
-                            <div className="w-7 h-7 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center mx-auto">
-                              <UserRound className="w-3.5 h-3.5" />
-                            </div>
-                          )}
-                        </td>
+                    filteredLeads.map((lead) => {
+                      const isSelected = selectedIds.has(lead.id);
 
-                        <td className="p-2.5 font-semibold text-stone-900">{lead.name}</td>
-                        <td className="p-2.5 text-stone-700">{lead.phone}</td>
-                        <td className="p-2.5 text-stone-800 font-medium">
-                          {lead.village || '—'}
-                        </td>
-                        <td className="p-2.5 text-stone-600">{lead.mandal || '—'}</td>
-                        <td className="p-2.5 text-stone-600">{lead.district || '—'}</td>
-
-                        <td className="p-2.5">
-                          {(() => {
-                            const source = normaliseLeadSource(lead.lead_source);
-                            return (
-                              <span
-                                className={`px-2 py-0.5 rounded text-[11px] font-medium border ${
-                                  SOURCE_TONES[source] || SOURCE_TONES.MyOperator
-                                }`}
-                                title={
-                                  source === lead.lead_source
-                                    ? undefined
-                                    : `Stored as "${lead.lead_source}"`
-                                }
-                              >
-                                {source}
-                              </span>
-                            );
-                          })()}
-                        </td>
-
-                        {/* Inline squad attachment */}
-                        <td
-                          className="p-2 text-center min-w-[240px] w-64"
-                          onClick={(e) => e.stopPropagation()}
+                      return (
+                        <tr
+                          key={lead.id}
+                          onClick={() => openLead(lead)}
+                          className={`hover:bg-stone-50/80 cursor-pointer transition-colors ${
+                            isSelected ? 'bg-blue-50/40' : ''
+                          }`}
                         >
-                          {teams.length === 0 ? (
-                            <span className="text-[10px] text-stone-400">
-                              No squads configured
-                            </span>
-                          ) : (
-                            <div className="inline-flex items-center gap-1.5 justify-center px-2 py-1 bg-stone-50/80 rounded-lg border border-stone-200">
-                              {teams.map((team, idx) => {
-                                const isAttached =
-                                  String(lead.assigned_team_id) === String(team.id);
-                                const leader = employeeById.get(String(team.teamLeaderId));
-                                const leaderName = leader?.name || team.teamLeaderName;
-
-                                return (
-                                  <button
-                                    key={team.id}
-                                    type="button"
-                                    disabled={String(attachingId) === String(lead.id)}
-                                    title={`Squad ${idx + 1}: ${team.name}\nTeam leader: ${leaderName}\n${
-                                      isAttached
-                                        ? '✓ Attached (click to detach)'
-                                        : 'Click to attach this lead to the squad'
-                                    }`}
-                                    onClick={() => handleToggleTeam(lead, team)}
-                                    className={`relative p-0.5 rounded-full transition-all duration-150 disabled:opacity-50 ${
-                                      isAttached
-                                        ? 'ring-2 ring-blue-600 ring-offset-1 scale-110 shadow-2xs z-10 bg-blue-50'
-                                        : 'opacity-75 hover:opacity-100 hover:scale-110 border border-stone-200 hover:border-blue-400 bg-white'
-                                    }`}
-                                  >
-                                    <PersonAvatar
-                                      name={leaderName}
-                                      photo={leader?.photo || team.teamLeaderPhoto}
-                                      size="xs"
-                                    />
-                                    {isAttached && (
-                                      <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-blue-600 border border-white rounded-full flex items-center justify-center shadow-2xs">
-                                        <Check className="w-2 h-2 text-white stroke-[3]" />
-                                      </span>
-                                    )}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </td>
-
-                        <td
-                          className="p-2.5 text-right"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => setCallLead(lead)}
-                            className="px-2.5 py-1 rounded bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-xs inline-flex items-center gap-1 shadow-2xs transition-colors"
+                          <td
+                            className="p-2.5 text-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSelectLead(lead.id);
+                            }}
                           >
-                            <Phone className="w-3 h-3" />
-                            Call
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                            <button
+                              type="button"
+                              aria-label={`Select ${lead.name}`}
+                              className="p-1 hover:bg-stone-200/60 rounded text-stone-600"
+                            >
+                              {isSelected ? (
+                                <CheckSquare className="w-4 h-4 text-blue-600" />
+                              ) : (
+                                <Square className="w-4 h-4 text-stone-300" />
+                              )}
+                            </button>
+                          </td>
+
+                          <td className="p-2 text-center" onClick={(e) => e.stopPropagation()}>
+                            <PersonAvatar
+                              name={lead.name}
+                              photo={lead.photo}
+                              size="xs"
+                              className="mx-auto"
+                            />
+                          </td>
+
+                          <td className="p-2.5 font-semibold text-stone-900">
+                            <div className="flex items-center gap-1.5">
+                              <span>{lead.name}</span>
+                              {!lead.assignedTeamId && (
+                                <span
+                                  className="w-2 h-2 rounded-full bg-amber-500 shrink-0"
+                                  title="Unattached Lead"
+                                />
+                              )}
+                            </div>
+                          </td>
+                          <td className="p-2.5 font-mono text-stone-700">{lead.phone}</td>
+                          <td className="p-2.5 text-stone-800 font-medium">
+                            {lead.nativeVillage || '—'}
+                          </td>
+                          <td className="p-2.5 text-stone-600">{lead.mandal || '—'}</td>
+                          <td className="p-2.5 text-stone-600">{lead.district || '—'}</td>
+
+                          <td className="p-2.5">
+                            <span
+                              className={`px-2 py-0.5 rounded text-[11px] font-medium border ${
+                                SOURCE_TONES[lead.source] || SOURCE_TONES.MyOperator
+                              }`}
+                            >
+                              {lead.source}
+                            </span>
+                          </td>
+
+                          {/* Inline squad attachment */}
+                          <td
+                            className="p-2 text-center min-w-[240px] w-64"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {teams.length === 0 ? (
+                              <span className="text-[10px] text-stone-400">
+                                No squads configured
+                              </span>
+                            ) : (
+                              <div className="inline-flex items-center gap-1.5 justify-center px-2 py-1 bg-stone-50/80 rounded-lg border border-stone-200">
+                                {teams.map((team, idx) => {
+                                  const isAttached = sameId(lead.assignedTeamId, team.id);
+                                  const leader = employeeById.get(String(team.teamLeaderId));
+                                  const leaderName = leader?.name || team.teamLeaderName;
+
+                                  return (
+                                    <button
+                                      key={team.id}
+                                      type="button"
+                                      disabled={sameId(attachingId, lead.id)}
+                                      title={`Team ${idx + 1}: ${squadLabel(team)}\nTeam Leader: ${leaderName}\n${
+                                        isAttached
+                                          ? '✓ Attached (Click to detach)'
+                                          : 'Click to attach lead to this team'
+                                      }`}
+                                      onClick={() => handleToggleTeam(lead, team)}
+                                      className={`relative p-0.5 rounded-full transition-all duration-150 disabled:opacity-50 ${
+                                        isAttached
+                                          ? 'ring-2 ring-blue-600 ring-offset-1 scale-110 shadow-xs z-10 bg-blue-50'
+                                          : 'opacity-75 hover:opacity-100 hover:scale-110 border border-stone-200 hover:border-blue-400 bg-white'
+                                      }`}
+                                    >
+                                      <PersonAvatar
+                                        name={leaderName}
+                                        photo={leader?.photo || team.teamLeaderPhoto}
+                                        size="xs"
+                                      />
+                                      {isAttached && (
+                                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-blue-600 border border-white rounded-full flex items-center justify-center shadow-2xs">
+                                          <Check className="w-2 h-2 text-white stroke-[3]" />
+                                        </span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
             </div>
 
-            <div className="px-3 py-2 border-t border-stone-200 bg-stone-50/60 flex flex-wrap items-center justify-between gap-2 text-[11px] text-stone-500">
+            <div className="p-2.5 bg-stone-50 border-t border-stone-200 text-xs text-stone-500 flex items-center justify-between">
               <span>
                 Showing {filteredLeads.length} of {leads.length} total agent leads
               </span>
               <span>
-                Level 1: Leads attached to teams move to “Allot Leads” for caller
-                distribution.
+                Leads attached to Teams move to &quot;Allot Leads&quot; for caller distribution.
               </span>
             </div>
           </div>
@@ -547,11 +650,11 @@ export default function LeadsTab({ refresh }) {
                     <span className="truncate">Team Distribution</span>
                   </h3>
                   <p className="text-[10px] text-stone-500 mt-0.5 truncate">
-                    {teams.length} Team{teams.length === 1 ? '' : 's'} Allotment
+                    {teams.length} {teams.length === 1 ? 'Team' : 'Teams'} Allotment
                   </p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className="text-[10px] font-bold text-stone-600 px-1.5 py-0.5 bg-stone-100 rounded border border-stone-200">
+                  <span className="text-[10px] font-mono font-bold text-stone-600 px-1.5 py-0.5 bg-stone-100 rounded border border-stone-200">
                     {distribution.totalLeads}
                   </span>
                   <button
@@ -582,7 +685,7 @@ export default function LeadsTab({ refresh }) {
                     <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                     Unattached Leads
                   </span>
-                  <span className="text-xs font-bold text-amber-900 px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300">
+                  <span className="text-xs font-mono font-bold text-amber-900 px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300">
                     {distribution.unattachedCount}
                   </span>
                 </div>
@@ -611,8 +714,8 @@ export default function LeadsTab({ refresh }) {
                       <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
                       <span>Team Lead Allotment Trends</span>
                     </span>
-                    <span className="text-[9px] text-stone-500">
-                      {teams.length} Team{teams.length === 1 ? '' : 's'}
+                    <span className="text-[9px] font-mono text-stone-500">
+                      {teams.length} {teams.length === 1 ? 'Team' : 'Teams'}
                     </span>
                   </div>
 
@@ -625,7 +728,7 @@ export default function LeadsTab({ refresh }) {
                           const payload = e?.activePayload?.[0]?.payload;
                           if (payload?.teamId) {
                             setTeamFilter((prev) =>
-                              prev === payload.teamId ? 'All' : payload.teamId
+                              sameId(prev, payload.teamId) ? 'All' : payload.teamId
                             );
                           }
                         }}
@@ -654,7 +757,7 @@ export default function LeadsTab({ refresh }) {
                             fontSize: '11px',
                             padding: '6px 10px',
                           }}
-                          formatter={(value) => [`${value} leads`, 'Attached leads']}
+                          formatter={(value) => [`${value} leads`, 'Attached Leads']}
                           labelFormatter={(label, payload) => {
                             const item = payload?.[0]?.payload;
                             return item ? `${item.fullName} · TL: ${item.leader}` : label;
@@ -683,6 +786,7 @@ export default function LeadsTab({ refresh }) {
                     <button
                       type="button"
                       onClick={() => setShowTeamsLineGraph((p) => !p)}
+                      title="Toggle Teams Lead Allotment Line Graph"
                       className="text-[10px] text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 transition-colors"
                     >
                       <TrendingUp className="w-3 h-3" />
@@ -693,13 +797,13 @@ export default function LeadsTab({ refresh }) {
 
                 {teams.length === 0 ? (
                   <p className="text-[11px] text-stone-400 py-3 text-center">
-                    No recruitment squads yet. Allot employees to a team leader in
-                    Management → Crew.
+                    No recruitment squads yet. Allot employees to a team leader in Management →
+                    Crew.
                   </p>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
                     {distribution.teamStats.map(({ team, teamLeadCount, leader }, idx) => {
-                      const isFiltered = String(teamFilter) === String(team.id);
+                      const isFiltered = sameId(teamFilter, team.id);
                       const percentage =
                         distribution.totalLeads > 0
                           ? Math.round((teamLeadCount / distribution.totalLeads) * 100)
@@ -731,14 +835,14 @@ export default function LeadsTab({ refresh }) {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between gap-1">
                                 <span className="font-bold text-[11px] text-stone-900 truncate">
-                                  {team.shortName}
+                                  {squadLabel(team)}
                                 </span>
-                                <span className="text-[11px] font-bold text-[#2563EB] shrink-0 bg-white px-1 rounded border border-blue-200">
+                                <span className="font-mono text-[11px] font-bold text-[#2563EB] shrink-0 bg-white px-1 rounded border border-blue-200">
                                   {teamLeadCount}
                                 </span>
                               </div>
                               <div className="text-[10px] text-stone-500 truncate mt-0.5">
-                                TL: {(leader?.name || team.teamLeaderName).split(' ')[0]}
+                                TL: {firstName(leader?.name || team.teamLeaderName)}
                               </div>
                             </div>
                           </div>
@@ -755,7 +859,7 @@ export default function LeadsTab({ refresh }) {
                                 }}
                               />
                             </div>
-                            <div className="flex justify-between text-[8px] text-stone-400">
+                            <div className="flex justify-between text-[8px] text-stone-400 font-mono">
                               <span>{percentage}% leads</span>
                               <span>{team.memberIds.length} mem</span>
                             </div>
@@ -765,44 +869,27 @@ export default function LeadsTab({ refresh }) {
                     })}
                   </div>
                 )}
+
+                {/* Total balance */}
+                <div className="mt-2 pt-1.5 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-600 font-medium">
+                  <span>Attached vs Total</span>
+                  <span className="font-mono font-bold text-stone-900">
+                    {distribution.totalLeads - distribution.unattachedCount} /{' '}
+                    {distribution.totalLeads} Leads
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {showAddLead && (
-        <AddLeadModal
-          onClose={() => setShowAddLead(false)}
-          onSaved={(name) => {
-            setShowAddLead(false);
-            setNotice(`New lead “${name}” created successfully.`);
-            load();
-            refresh?.();
-          }}
-        />
-      )}
-
-      {showAddMultiple && (
-        <AddMultipleLeadsModal
-          onClose={() => setShowAddMultiple(false)}
+      {showAddLeads && (
+        <AddLeadsModal
+          onClose={() => setShowAddLeads(false)}
           onSaved={(count) => {
-            setShowAddMultiple(false);
-            setNotice(`${count} lead(s) created successfully.`);
-            load();
-            refresh?.();
-          }}
-        />
-      )}
-
-      {callLead && (
-        <CallWorkspaceModal
-          lead={callLead}
-          queue="first-call"
-          onClose={() => setCallLead(null)}
-          onDone={() => {
-            load();
-            refresh?.();
+            setNotice(`${count} lead${count === 1 ? '' : 's'} created successfully.`);
+            notifyChanged();
           }}
         />
       )}
