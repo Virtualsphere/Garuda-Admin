@@ -11,7 +11,7 @@ import {
   Loader2,
 } from 'lucide-react';
 
-import useLocationTree from '../../../hooks/useLocationTree';
+import useLocationLevels from '../../../hooks/useLocationLevels';
 import agentLeadService from '../../../services/agentLeadService';
 import recruitmentService from '../../../services/recruitmentService';
 import { useRecruitmentDesk } from '../../../hooks/useRecruitmentDesk';
@@ -30,12 +30,15 @@ const newRow = (inherit = {}) => {
     id: `row-${Date.now()}-${rowSeq}`,
     name: '',
     phone: '',
-    state: inherit.state || '',
-    district: inherit.district || '',
-    mandal: inherit.mandal || '',
-    village: '',
+    // Location ids from the master directory; names are looked up on save.
+    stateId: inherit.stateId || '',
+    districtId: inherit.districtId || '',
+    mandalId: inherit.mandalId || '',
+    villageId: '',
   };
 };
+
+const nameIn = (list, id) => list.find((x) => String(x.id) === String(id))?.name || '';
 
 const cellSelect =
   'w-full px-2 py-1.5 border border-stone-200 rounded text-xs focus:outline-hidden focus:border-[#2563EB] bg-white text-stone-800 disabled:bg-stone-50 disabled:text-stone-400';
@@ -53,23 +56,34 @@ const cellSelect =
  */
 export default function AddLeadsModal({ onClose, onSaved }) {
   const { agents, openLead, openAgent } = useRecruitmentDesk();
-  const { states, districtsOf, mandalsOf, villagesOf, loading: locationsLoading } =
-    useLocationTree();
+  const {
+    states,
+    statesLoading: locationsLoading,
+    error: locationsError,
+    loadDistricts,
+    loadMandals,
+    loadVillages,
+    districtsOf,
+    mandalsOf,
+    villagesOf,
+    isLoading: levelLoading,
+  } = useLocationLevels();
 
   const [rows, setRows] = useState(() => [newRow(), newRow(), newRow()]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [feedback, setFeedback] = useState(null);
 
-  // Default every row to the first state once the tree arrives — but only rows
-  // the user has not touched, so a slow response cannot overwrite a choice.
+  // Default every row to Telangana once the states arrive — but only rows the
+  // user has not touched, so a slow response cannot overwrite a choice.
   const defaultedState = useRef(false);
   useEffect(() => {
     if (defaultedState.current || !states.length) return;
     defaultedState.current = true;
     const preferred = states.find((s) => s.name === 'Telangana') || states[0];
-    setRows((prev) => prev.map((r) => (r.state ? r : { ...r, state: preferred.name })));
-  }, [states]);
+    setRows((prev) => prev.map((r) => (r.stateId ? r : { ...r, stateId: String(preferred.id) })));
+    loadDistricts(preferred.id);
+  }, [states, loadDistricts]);
 
   const agentByPhone = useMemo(() => {
     const map = new Map();
@@ -151,12 +165,17 @@ export default function AddLeadsModal({ onClose, onSaved }) {
       prev.map((row, i) => {
         if (i !== index) return row;
         // Changing a level clears the ones beneath it, exactly as the cascade implies.
-        if (field === 'state') return { ...row, state: value, district: '', mandal: '', village: '' };
-        if (field === 'district') return { ...row, district: value, mandal: '', village: '' };
-        if (field === 'mandal') return { ...row, mandal: value, village: '' };
+        if (field === 'stateId')
+          return { ...row, stateId: value, districtId: '', mandalId: '', villageId: '' };
+        if (field === 'districtId') return { ...row, districtId: value, mandalId: '', villageId: '' };
+        if (field === 'mandalId') return { ...row, mandalId: value, villageId: '' };
         return { ...row, [field]: value };
       })
     );
+    // Fetch the next level down (cached per parent, so repeat picks are free).
+    if (field === 'stateId') loadDistricts(value);
+    if (field === 'districtId') loadMandals(value);
+    if (field === 'mandalId') loadVillages(value);
   };
 
   const addRows = (count) =>
@@ -165,7 +184,11 @@ export default function AddLeadsModal({ onClose, onSaved }) {
       return [
         ...prev,
         ...Array.from({ length: count }, () =>
-          newRow({ state: last?.state, district: last?.district, mandal: last?.mandal })
+          newRow({
+            stateId: last?.stateId,
+            districtId: last?.districtId,
+            mandalId: last?.mandalId,
+          })
         ),
       ];
     });
@@ -191,20 +214,33 @@ export default function AddLeadsModal({ onClose, onSaved }) {
         return;
       }
 
-      const state = rows[0]?.state || states.find((s) => s.name === 'Telangana')?.name || states[0]?.name || '';
+      const stateId = String(
+        rows[0]?.stateId ||
+          states.find((s) => s.name === 'Telangana')?.id ||
+          states[0]?.id ||
+          ''
+      );
       const match = (list, value) =>
-        list.find((x) => String(x.name).toLowerCase() === String(value || '').trim().toLowerCase())?.name || '';
+        String(
+          list.find(
+            (x) => String(x.name).toLowerCase() === String(value || '').trim().toLowerCase()
+          )?.id || ''
+        );
 
-      const parsed = lines.map((line) => {
-        const [name = '', phone = '', village = '', mandal = '', district = ''] = line
-          .split(/\t|,/)
-          .map((c) => c.trim());
+      // Each level is fetched on demand by its parent id; the hook caches and
+      // de-duplicates, so a sheet with one mandal repeated costs one request.
+      const parsed = await Promise.all(
+        lines.map(async (line) => {
+          const [name = '', phone = '', village = '', mandal = '', district = ''] = line
+            .split(/\t|,/)
+            .map((c) => c.trim());
 
-        const d = match(districtsOf(state), district);
-        const m = d ? match(mandalsOf(state, d), mandal) : '';
-        const v = d && m ? match(villagesOf(state, d, m), village) : '';
-        return { ...newRow({ state }), name, phone, district: d, mandal: m, village: v };
-      });
+          const d = district ? match(await loadDistricts(stateId), district) : '';
+          const m = d && mandal ? match(await loadMandals(d), mandal) : '';
+          const v = m && village ? match(await loadVillages(m), village) : '';
+          return { ...newRow({ stateId }), name, phone, districtId: d, mandalId: m, villageId: v };
+        })
+      );
 
       setRows(parsed.filter((r) => r.name || r.phone));
     } catch {
@@ -246,15 +282,22 @@ export default function AddLeadsModal({ onClose, onSaved }) {
         continue;
       }
 
+      // The lead stores place *names* (the directory ids are not referenced
+      // anywhere outside the location tables), so resolve them from the cache.
+      const state = nameIn(states, row.stateId);
+      const district = nameIn(districtsOf(row.stateId), row.districtId);
+      const mandal = nameIn(mandalsOf(row.districtId), row.mandalId);
+      const village = nameIn(villagesOf(row.mandalId), row.villageId);
+
       try {
         await recruitmentService.createCandidate({
           name: row.name.trim(),
           phone: tail10(row.phone),
           lead_source: ENTRY_SOURCE,
-          state: row.state || undefined,
-          district: row.district || undefined,
-          mandal: row.mandal || undefined,
-          village: row.village || undefined,
+          state: state || undefined,
+          district: district || undefined,
+          mandal: mandal || undefined,
+          village: village || undefined,
           // Unowned: see the note on the component.
           assigned_employee_id: null,
         });
@@ -369,6 +412,16 @@ export default function AddLeadsModal({ onClose, onSaved }) {
           </div>
         )}
 
+        {/* Without the tree every location select is empty; say why instead of
+            leaving the grid looking broken. Leads can still be saved without one. */}
+        {locationsError && (
+          <div className="px-4 py-2 text-xs font-semibold bg-amber-50 text-amber-800 border-b border-amber-200 flex items-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+            {locationsError} Leads can still be saved without a location — reopen this form to
+            retry.
+          </div>
+        )}
+
         {/* Grid */}
         <div className="flex-1 overflow-auto p-4">
           <table className="w-full text-xs border-collapse">
@@ -387,9 +440,16 @@ export default function AddLeadsModal({ onClose, onSaved }) {
             <tbody className="divide-y divide-stone-100">
               {rows.map((row, index) => {
                 const dup = duplicateOf(row, index);
-                const districts = districtsOf(row.state);
-                const mandals = mandalsOf(row.state, row.district);
-                const villages = villagesOf(row.state, row.district, row.mandal);
+                const districts = districtsOf(row.stateId);
+                const mandals = mandalsOf(row.districtId);
+                const villages = villagesOf(row.mandalId);
+                // "Loading…" while fetching; "None found" once an empty list is back.
+                const placeholder = (level, parentId, list, label) =>
+                  levelLoading(level, parentId)
+                    ? 'Loading…'
+                    : parentId && !list.length
+                    ? `No ${level} found`
+                    : `Select ${label}`;
                 const phoneInvalid = row.phone.trim() && tail10(row.phone).length !== 10;
 
                 return (
@@ -429,14 +489,14 @@ export default function AddLeadsModal({ onClose, onSaved }) {
                       </td>
                       <td className="p-1">
                         <select
-                          value={row.state}
-                          onChange={(e) => changeRow(index, 'state', e.target.value)}
+                          value={row.stateId}
+                          onChange={(e) => changeRow(index, 'stateId', e.target.value)}
                           disabled={locationsLoading}
                           className={cellSelect}
                         >
                           <option value="">{locationsLoading ? 'Loading…' : 'Select state'}</option>
                           {states.map((s) => (
-                            <option key={s.id} value={s.name}>
+                            <option key={s.id} value={String(s.id)}>
                               {s.name}
                             </option>
                           ))}
@@ -444,14 +504,16 @@ export default function AddLeadsModal({ onClose, onSaved }) {
                       </td>
                       <td className="p-1">
                         <select
-                          value={row.district}
-                          onChange={(e) => changeRow(index, 'district', e.target.value)}
-                          disabled={!row.state}
+                          value={row.districtId}
+                          onChange={(e) => changeRow(index, 'districtId', e.target.value)}
+                          disabled={!row.stateId || !districts.length}
                           className={cellSelect}
                         >
-                          <option value="">Select district</option>
+                          <option value="">
+                            {placeholder('districts', row.stateId, districts, 'district')}
+                          </option>
                           {districts.map((d) => (
-                            <option key={d.id} value={d.name}>
+                            <option key={d.id} value={String(d.id)}>
                               {d.name}
                             </option>
                           ))}
@@ -459,14 +521,16 @@ export default function AddLeadsModal({ onClose, onSaved }) {
                       </td>
                       <td className="p-1">
                         <select
-                          value={row.mandal}
-                          onChange={(e) => changeRow(index, 'mandal', e.target.value)}
-                          disabled={!row.district}
+                          value={row.mandalId}
+                          onChange={(e) => changeRow(index, 'mandalId', e.target.value)}
+                          disabled={!row.districtId || !mandals.length}
                           className={cellSelect}
                         >
-                          <option value="">Select mandal</option>
+                          <option value="">
+                            {placeholder('mandals', row.districtId, mandals, 'mandal')}
+                          </option>
                           {mandals.map((m) => (
-                            <option key={m.id} value={m.name}>
+                            <option key={m.id} value={String(m.id)}>
                               {m.name}
                             </option>
                           ))}
@@ -474,14 +538,16 @@ export default function AddLeadsModal({ onClose, onSaved }) {
                       </td>
                       <td className="p-1">
                         <select
-                          value={row.village}
-                          onChange={(e) => changeRow(index, 'village', e.target.value)}
-                          disabled={!row.mandal}
+                          value={row.villageId}
+                          onChange={(e) => changeRow(index, 'villageId', e.target.value)}
+                          disabled={!row.mandalId || !villages.length}
                           className={cellSelect}
                         >
-                          <option value="">Select village</option>
+                          <option value="">
+                            {placeholder('villages', row.mandalId, villages, 'village')}
+                          </option>
                           {villages.map((v) => (
-                            <option key={v.id} value={v.name}>
+                            <option key={v.id} value={String(v.id)}>
                               {v.name}
                             </option>
                           ))}
