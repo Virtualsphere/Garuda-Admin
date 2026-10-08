@@ -577,8 +577,11 @@ export default function LeadsTab() {
                             onClick={(e) => e.stopPropagation()}
                           >
                             {teams.length === 0 ? (
-                              <span className="text-[10px] text-stone-400">
-                                No squads configured
+                              <span
+                                className="text-[10px] text-stone-400"
+                                title="Create a squad in Management → Hierarchy & Teams"
+                              >
+                                No squads yet — see Management → Hierarchy &amp; Teams
                               </span>
                             ) : (
                               <div className="inline-flex items-center gap-1.5 justify-center px-2 py-1 bg-stone-50/80 rounded-lg border border-stone-200">
@@ -797,8 +800,8 @@ export default function LeadsTab() {
 
                 {teams.length === 0 ? (
                   <p className="text-[11px] text-stone-400 py-3 text-center">
-                    No recruitment squads yet. Allot employees to a team leader in Management →
-                    Crew.
+                    No recruitment squads yet. Create one in Management → Hierarchy &amp; Teams
+                    (Create New Squad / Team Leader), then attach leads here.
                   </p>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
