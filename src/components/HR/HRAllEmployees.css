@@ -363,3 +363,451 @@
   border-color: var(--accent);
 }
 
+
+/* ── Registry operations (create / edit / bulk / roles) ── */
+.hr-emp-actions {
+  flex-wrap: wrap;
+}
+
+.hr-primary-btn {
+  padding: 10px 22px;
+  background: var(--accent) !important;
+  color: #ffffff;
+  border-radius: 24px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.hr-primary-btn.small {
+  padding: 6px 14px;
+}
+
+.hr-primary-btn:disabled,
+.hr-emp-global-btn:disabled,
+.hr-emp-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hr-emp-global-btn.danger,
+.hr-emp-action-btn.danger {
+  color: var(--red);
+  border-color: #fecaca;
+}
+
+.hr-emp-action-btn.icon {
+  padding: 8px;
+}
+
+.hr-emp-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.hr-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hr-col-check {
+  width: 36px;
+}
+
+.hr-col-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.hr-emp-table tbody tr.is-selected {
+  background: var(--accent-lighter);
+}
+
+.hr-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.hr-status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.hr-status.trainee {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.hr-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hr-alert.success {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.hr-alert.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.hr-alert button {
+  font-size: 18px;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+}
+
+.hr-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  background: var(--accent-lighter);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hr-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-light);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.hr-page-indicator {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hr-back-btn {
+  align-self: flex-start;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+/* ── Employee form ── */
+.hr-form {
+  padding-bottom: 32px;
+}
+
+.hr-form-section {
+  margin-bottom: 20px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--accent);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.hr-form-section-title {
+  padding: 14px 20px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--accent-lighter);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.hr-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+.hr-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hr-form-field.full {
+  grid-column: 1 / -1;
+}
+
+.hr-form-field > span {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hr-form-field input,
+.hr-form-field select,
+.hr-password {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border) !important;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+.hr-form-field input:focus,
+.hr-form-field select:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+}
+
+.hr-form-field select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hr-password {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 0 0 14px;
+}
+
+.hr-password input {
+  flex: 1;
+  padding: 10px 0;
+  border: none !important;
+}
+
+.hr-password button {
+  padding: 0 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.hr-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hr-upload-row a {
+  color: var(--accent);
+}
+
+.hr-upload-btn {
+  padding: 9px 16px;
+  background: var(--accent-lighter);
+  border: 1px dashed var(--accent-border);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.hr-upload-btn input {
+  display: none;
+}
+
+.hr-upload-btn.disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* ── Employee detail ── */
+.hr-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding-bottom: 32px;
+}
+
+.hr-detail-card {
+  padding: 20px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.hr-detail-card h4 {
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hr-detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 13px;
+}
+
+.hr-detail-row:last-child {
+  border-bottom: none;
+}
+
+.hr-detail-row > span {
+  color: var(--text-secondary);
+}
+
+.hr-detail-row strong {
+  text-align: right;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.hr-detail-row a {
+  color: var(--accent);
+}
+
+/* ── Roles modal ── */
+.hr-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.hr-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(520px, 100%);
+  max-height: calc(100vh - 48px);
+  padding: 20px 24px 24px;
+  background: var(--bg-white);
+  border-top: 6px solid var(--accent);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.hr-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.hr-modal-close {
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.hr-modal-hint {
+  margin: 6px 0 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.hr-role-add {
+  display: flex;
+  gap: 8px;
+}
+
+.hr-role-add input,
+.hr-role-item input {
+  flex: 1;
+  padding: 9px 14px;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.hr-role-list {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hr-role-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.hr-role-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hr-role-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.hr-role-empty {
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 700px) {
+  .hr-emp-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hr-emp-page {
+    padding: 0 12px;
+  }
+}

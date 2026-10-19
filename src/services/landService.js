@@ -68,6 +68,21 @@ const landService = {
   },
 
   /**
+   * Save a land as call-verified. Same body as `update`, but this route is
+   * gated by the `call_verification` permission and stamps the verifier.
+   */
+  async callVerify(id, landData) {
+    const { data } = await apiClient.put(`/land/call/verify/${id}`, landData);
+    return data;
+  },
+
+  /** Lands submitted by employees whose status is TRAINEE. */
+  async getTraineeLands() {
+    const { data } = await apiClient.get('/trainee/land');
+    return data;
+  },
+
+  /**
    * Set (or change) the agent officially linked to a land. Passing `null`
    * unlinks it, which is how a land is returned to the unassigned pool.
    */

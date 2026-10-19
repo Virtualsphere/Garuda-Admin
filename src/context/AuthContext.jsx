@@ -18,6 +18,33 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Page-access permissions from /permission/me. ADMIN bypasses them all.
+  // Until they load, `hasPermission` answers false for gated pages.
+  const [permissions, setPermissions] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [permissionsLoaded, setPermissionsLoaded] = useState(false);
+
+  // ─── Permissions ───────────────────────────────────────────────
+  const fetchPermissions = useCallback(async () => {
+    try {
+      const { data } = await apiClient.get('/permission/me');
+      const payload = data.data || {};
+      setPermissions(Array.isArray(payload.permissions) ? payload.permissions : []);
+      setIsAdmin(!!payload.isAdmin);
+    } catch (err) {
+      console.error('Failed to load permissions:', err);
+      setPermissions([]);
+      setIsAdmin(false);
+    } finally {
+      setPermissionsLoaded(true);
+    }
+  }, []);
+
+  const hasPermission = useCallback(
+    (key) => isAdmin || permissions.includes(key),
+    [isAdmin, permissions]
+  );
+
   // ─── Login ─────────────────────────────────────────────────────
   const login = useCallback(async (email, password) => {
     setIsLoading(true);
@@ -33,6 +60,7 @@ export function AuthProvider({ children }) {
 
       setUser(employee);
       setIsAuthenticated(true);
+      fetchPermissions();
 
       return data;
     } catch (err) {
@@ -42,7 +70,7 @@ export function AuthProvider({ children }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [fetchPermissions]);
 
   // ─── Logout ────────────────────────────────────────────────────
   const logout = useCallback(async () => {
@@ -57,6 +85,9 @@ export function AuthProvider({ children }) {
       localStorage.removeItem('garuda_user');
       setUser(null);
       setIsAuthenticated(false);
+      setPermissions([]);
+      setIsAdmin(false);
+      setPermissionsLoaded(false);
     }
   }, []);
 
@@ -94,6 +125,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (isAuthenticated) {
       fetchProfile();
+      fetchPermissions();
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -105,6 +137,11 @@ export function AuthProvider({ children }) {
     login,
     logout,
     fetchProfile,
+    permissions,
+    isAdmin,
+    permissionsLoaded,
+    hasPermission,
+    fetchPermissions,
   };
 
   return (

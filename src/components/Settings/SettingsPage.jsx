@@ -5,6 +5,7 @@ import SettingsEnquiry from './SettingsEnquiry';
 import SettingsLandsTarget from './SettingsLandsTarget';
 import SettingsRequiredAgents from './SettingsRequiredAgents';
 import SettingsPetrol from './SettingsPetrol';
+import SettingsPermissions from './SettingsPermissions';
 
 export default function SettingsPage({ activeTab }) {
   const renderContent = () => {
@@ -19,6 +20,8 @@ export default function SettingsPage({ activeTab }) {
         return <SettingsRequiredAgents />;
       case 'petrol':
         return <SettingsPetrol />;
+      case 'permissions':
+        return <SettingsPermissions />;
       default:
         return <div style={{ padding: '24px', color: 'var(--text-muted)' }}>Page coming soon...</div>;
     }

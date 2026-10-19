@@ -1,0 +1,356 @@
+/* ── Land Form (extends AddLandForm.css card/field styles) ── */
+.lf-columns {
+  padding-bottom: 24px;
+}
+
+.lf-spaced {
+  margin-top: 16px;
+}
+
+.lf-check-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+  margin-top: 8px;
+}
+
+.lf-check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lf-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.lf-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.lf-yesno {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lf-yesno-options {
+  display: flex;
+  gap: 20px;
+}
+
+/* ── Toggle rows ── */
+.lf-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+}
+
+.lf-toggle-row:last-child {
+  border-bottom: none;
+}
+
+.lf-toggle-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.lf-toggle-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.lf-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.lf-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.lf-switch-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 22px;
+  transition: background 0.2s;
+}
+
+.lf-switch-slider::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s;
+}
+
+.lf-switch input:checked + .lf-switch-slider {
+  background: var(--accent);
+}
+
+.lf-switch input:checked + .lf-switch-slider::before {
+  transform: translateX(18px);
+}
+
+/* ── Buttons ── */
+.lf-fetch-btn,
+.lf-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--accent-lighter) !important;
+  color: var(--accent);
+  border: 1px solid var(--accent-border) !important;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.lf-fetch-btn.small {
+  padding: 4px 10px;
+  font-size: 10px;
+}
+
+.lf-upload-btn input {
+  display: none;
+}
+
+.lf-upload-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Documents ── */
+.lf-doc-row {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.lf-doc-row:last-child {
+  border-bottom: none;
+}
+
+.lf-doc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.lf-doc-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: #f0fdf4;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.lf-doc-chip a {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.lf-doc-chip button {
+  font-size: 16px;
+  line-height: 1;
+  color: var(--red);
+  cursor: pointer;
+}
+
+/* ── Sheds / GPS / trees / towns ── */
+.lf-shed-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.lf-gps-block + .lf-gps-block {
+  margin-top: 20px;
+}
+
+.lf-tree-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.lf-town-block {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.lf-town-title {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Media ── */
+.lf-media-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.lf-media-tile {
+  position: relative;
+  min-height: 56px;
+  padding: 8px;
+  background: var(--bg-main) !important;
+  border: 1px dashed var(--border) !important;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.lf-media-tile:hover,
+.lf-media-tile.active {
+  border-color: var(--accent) !important;
+  color: var(--accent);
+}
+
+.lf-media-tile.has-media {
+  background: var(--accent-lighter) !important;
+  border-style: solid !important;
+}
+
+.lf-media-tile:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.lf-media-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: var(--accent);
+  color: #ffffff;
+  border-radius: 9px;
+  font-size: 10px;
+  line-height: 18px;
+}
+
+.lf-uploading {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.lf-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.lf-gallery-item {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.lf-gallery-item img,
+.lf-gallery-item video {
+  display: block;
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  background: var(--bg-main);
+}
+
+.lf-gallery-caption {
+  display: block;
+  padding: 4px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.lf-gallery-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: var(--red) !important;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 1200px) {
+  .lf-columns {
+    flex-wrap: wrap;
+  }
+
+  .lf-columns > .form-column {
+    flex: 1 1 340px;
+  }
+}
+
+@media (max-width: 600px) {
+  .lf-tree-grid,
+  .lf-shed-grid,
+  .lf-media-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

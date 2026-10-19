@@ -19,6 +19,7 @@ import HRPage from './components/HR/HRPage';
 import SettingsPage from './components/Settings/SettingsPage';
 import BuyersPage from './components/Buyers/BuyersPage';
 import BuyersDepartmentPage from './components/Buyers/BuyersDepartmentPage';
+import LocationsPage from './components/Locations/LocationsPage';
 import './App.css';
 
 const callCenterTopTabs = [
@@ -74,6 +75,16 @@ const settingsTopTabs = [
   { key: 'visiting', label: 'Visiting charges', icon: 'file' },
   { key: 'security', label: 'Agent security deposit', icon: 'file' },
   { key: 'offices', label: 'Regional offices', icon: 'grid' },
+  { key: 'permissions', label: 'Permissions', icon: 'shield', adminOnly: true },
+];
+
+const locationsTopTabs = [
+  { key: 'states', label: 'States', icon: 'map' },
+  { key: 'districts', label: 'Districts', icon: 'grid' },
+  { key: 'towns', label: 'Towns', icon: 'building' },
+  { key: 'mandals', label: 'Mandals', icon: 'grid' },
+  { key: 'villages', label: 'Villages', icon: 'pin' },
+  { key: 'roads', label: 'Roads & paths', icon: 'send' },
 ];
 
 function TopTabIcon({ type }) {
@@ -179,21 +190,42 @@ function TopTabIcon({ type }) {
           <circle cx="18.5" cy="18.5" r="2.5" />
         </svg>
       );
+    case 'shield':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+      );
+    case 'pin':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+      );
+    case 'building':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+          <path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01" />
+        </svg>
+      );
     default:
       return null;
   }
 }
 
 export default function App() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin, hasPermission, permissionsLoaded } = useAuth();
   const [activeSection, setActiveSection] = useState('farmers'); // Default to farmers for testing
   const [activeTabCallCenter, setActiveTabCallCenter] = useState('calls');
-  const [activeTabLand, setActiveTabLand] = useState('data');
+  const [activeTabLand, setActiveTabLand] = useState('land-data');
   const [activeTabFarmers, setActiveTabFarmers] = useState('department');
   const [activeTabBuyers, setActiveTabBuyers] = useState('process');
   const [activeTabAgents, setActiveTabAgents] = useState('recruitment');
   const [activeTabHR, setActiveTabHR] = useState('allemployees');
   const [activeTabSettings, setActiveTabSettings] = useState('visiting');
+  const [activeTabLocations, setActiveTabLocations] = useState('states');
 
   // Handle theme switching
   useEffect(() => {
@@ -211,6 +243,8 @@ export default function App() {
       document.documentElement.setAttribute('data-theme', 'hr');
     } else if (activeSection === 'settings') {
       document.documentElement.setAttribute('data-theme', 'settings');
+    } else if (activeSection === 'locations') {
+      document.documentElement.setAttribute('data-theme', 'locations');
     } else {
       document.documentElement.setAttribute('data-theme', 'callcenter');
     }
@@ -235,8 +269,11 @@ export default function App() {
     topTabs = hrTopTabs;
     activeTab = activeTabHR;
   } else if (activeSection === 'settings') {
-    topTabs = settingsTopTabs;
+    topTabs = settingsTopTabs.filter((tab) => !tab.adminOnly || isAdmin);
     activeTab = activeTabSettings;
+  } else if (activeSection === 'locations') {
+    topTabs = locationsTopTabs;
+    activeTab = activeTabLocations;
   }
   
   if (!isAuthenticated) {
@@ -256,6 +293,8 @@ export default function App() {
       setActiveTabHR(key);
     } else if (activeSection === 'settings') {
       setActiveTabSettings(key);
+    } else if (activeSection === 'locations') {
+      setActiveTabLocations(key);
     } else {
       setActiveTabCallCenter(key);
     }
@@ -373,7 +412,7 @@ export default function App() {
           )}
 
           {/* For other sections, show placeholder */}
-          {activeSection !== 'callcenter' && activeSection !== 'land' && activeSection !== 'farmers' && activeSection !== 'buyers' && activeSection !== 'agents' && activeSection !== 'hr' && activeSection !== 'settings' && (
+          {activeSection !== 'callcenter' && activeSection !== 'land' && activeSection !== 'farmers' && activeSection !== 'buyers' && activeSection !== 'agents' && activeSection !== 'hr' && activeSection !== 'settings' && activeSection !== 'locations' && (
             <div style={{ padding: '24px', color: 'var(--text-muted)' }}>Section coming soon...</div>
           )}
           {activeSection === 'agents' && (
@@ -384,6 +423,15 @@ export default function App() {
           )}
           {activeSection === 'settings' && (
             <SettingsPage activeTab={activeTab} />
+          )}
+          {activeSection === 'locations' && (
+            hasPermission('location') ? (
+              <LocationsPage activeTab={activeTab} onTabChange={setActiveTabLocations} />
+            ) : (
+              <div style={{ padding: '24px', color: 'var(--text-muted)' }}>
+                {permissionsLoaded ? 'You do not have access to Locations.' : 'Checking access...'}
+              </div>
+            )
           )}
         </div>
 
