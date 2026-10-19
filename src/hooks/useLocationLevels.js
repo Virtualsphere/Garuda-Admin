@@ -16,6 +16,7 @@ const LEVEL_PATHS = {
   districts: (stateId) => `/location/districts/${stateId}`,
   mandals: (districtId) => `/location/mandals/${districtId}`,
   villages: (mandalId) => `/location/villages/${mandalId}`,
+  towns: (districtId) => `/location/towns/${districtId}`,
 };
 
 /**
@@ -36,8 +37,8 @@ export default function useLocationLevels() {
   const [statesLoading, setStatesLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // { districts: { [stateId]: [...] }, mandals: {...}, villages: {...} }
-  const [cache, setCache] = useState({ districts: {}, mandals: {}, villages: {} });
+  // { districts: { [stateId]: [...] }, mandals: {...}, villages: {...}, towns: { [districtId]: [...] } }
+  const [cache, setCache] = useState({ districts: {}, mandals: {}, villages: {}, towns: {} });
   const [pending, setPending] = useState({});
   const inFlight = useRef(new Map());
 
@@ -98,10 +99,12 @@ export default function useLocationLevels() {
   const loadDistricts = useCallback((stateId) => load('districts', stateId), [load]);
   const loadMandals = useCallback((districtId) => load('mandals', districtId), [load]);
   const loadVillages = useCallback((mandalId) => load('villages', mandalId), [load]);
+  const loadTowns = useCallback((districtId) => load('towns', districtId), [load]);
 
   const districtsOf = useCallback((stateId) => cache.districts[stateId] || [], [cache]);
   const mandalsOf = useCallback((districtId) => cache.mandals[districtId] || [], [cache]);
   const villagesOf = useCallback((mandalId) => cache.villages[mandalId] || [], [cache]);
+  const townsOf = useCallback((districtId) => cache.towns[districtId] || [], [cache]);
 
   const isLoading = useCallback(
     (level, parentId) => Boolean(pending[`${level}:${parentId}`]),
@@ -115,9 +118,11 @@ export default function useLocationLevels() {
     loadDistricts,
     loadMandals,
     loadVillages,
+    loadTowns,
     districtsOf,
     mandalsOf,
     villagesOf,
+    townsOf,
     isLoading,
   };
 }

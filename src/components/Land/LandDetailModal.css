@@ -1,0 +1,261 @@
+/* ── Land Detail Modal ── */
+.ldm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.ldm-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(960px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+  background: var(--bg-white);
+  border-top: 6px solid var(--accent);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.ldm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 12px;
+}
+
+.ldm-title {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.ldm-subtitle {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ldm-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ldm-edit-btn {
+  padding: 8px 16px;
+  background: var(--accent) !important;
+  color: #ffffff;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.ldm-close {
+  width: 32px;
+  height: 32px;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.ldm-close:hover {
+  color: var(--text-primary);
+}
+
+.ldm-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.ldm-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 2px solid transparent !important;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ldm-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent) !important;
+}
+
+.ldm-tab-count {
+  padding: 0 6px;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  border-radius: 8px;
+  font-size: 10px;
+}
+
+.ldm-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 24px;
+}
+
+.ldm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.ldm-grid section {
+  padding: 16px;
+  background: var(--bg-main);
+  border-radius: var(--radius-lg);
+}
+
+.ldm-grid h4 {
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ldm-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 13px;
+}
+
+.ldm-row:last-child {
+  border-bottom: none;
+}
+
+.ldm-label {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.ldm-value {
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+  text-transform: capitalize;
+  overflow-wrap: anywhere;
+}
+
+.ldm-status {
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ldm-status.complete {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.ldm-status.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.ldm-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.ldm-media {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.ldm-media img,
+.ldm-media video {
+  display: block;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  background: var(--bg-main);
+}
+
+.ldm-media span {
+  display: block;
+  padding: 6px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.ldm-doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ldm-doc {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ldm-doc:hover {
+  border-color: var(--accent);
+}
+
+.ldm-doc-open {
+  color: var(--accent);
+}
+
+.ldm-empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .ldm-overlay {
+    padding: 0;
+  }
+
+  .ldm-modal {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .ldm-grid {
+    grid-template-columns: 1fr;
+  }
+}

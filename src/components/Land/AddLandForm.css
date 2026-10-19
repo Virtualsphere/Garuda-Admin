@@ -510,3 +510,39 @@
     gap: 16px;
   }
 }
+
+/* ── Land editor (verification queues) ── */
+.land-editor-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.save-draft-btn.land-editor-delete {
+  color: var(--red);
+  border-color: #fecaca;
+}
+
+.land-editor-status {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+@media (max-width: 700px) {
+  .land-editor-status {
+    grid-template-columns: 1fr;
+  }
+}

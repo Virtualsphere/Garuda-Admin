@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import landService from '../../services/landService';
 import useFieldExecutiveFilter from '../../hooks/useFieldExecutiveFilter';
+import { landCode, landAddress, landUnitProfile, matchesLandSearch } from '../../utils/landRecord';
 
-export default function VerifiedLandsList() {
+export default function VerifiedLandsList({ onView, onEdit, onDelete }) {
   const [lands, setLands] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const {
     executives, dateFrom, setDateFrom, dateTo, setDateTo,
@@ -12,39 +14,43 @@ export default function VerifiedLandsList() {
   } = useFieldExecutiveFilter();
 
   useEffect(() => {
-    const fetchLands = async () => {
-      try {
-        const data = await landService.getByVerificationStatus('complete');
-        setLands(data.data || []);
-      } catch (err) {
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+    landService
+      .getByVerificationStatus('complete')
+      .then((data) => { if (!cancelled) setLands(data.data || []); })
+      .catch((err) => {
         console.error('Failed to fetch verified lands:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchLands();
+        if (!cancelled) {
+          setLands([]);
+          setLoadError('Could not load verified lands.');
+        }
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
-  const filteredLands = lands.filter(land => {
-    if (!matchesFilters(land)) return false;
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    const farmerName = land.farmerDetails?.farmer_name?.toLowerCase() || '';
-    return farmerName.includes(q) || String(land.id).includes(q);
-  });
+  const handleDelete = async (land) => {
+    if (await onDelete(land)) setLands((prev) => prev.filter((l) => l.id !== land.id));
+  };
+
+  const executiveName = (id) => executives.find((e) => String(e.id) === String(id))?.name || '—';
+
+  const filteredLands = lands.filter((land) => matchesFilters(land) && matchesLandSearch(land, searchQuery));
 
   return (
     <div className="ledger-card">
       <div className="ledger-header">
         <div className="ledger-title-group">
           <span className="ledger-title">VERIFIED LANDS MASTER LEDGER</span>
-          <span className="ledger-subtitle">FINALIZED ORGANIZATIONAL PROPERTIES</span>
+          <span className="ledger-subtitle">FINALIZED ORGANIZATIONAL PROPERTIES ({filteredLands.length})</span>
         </div>
         <div className="ledger-search">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text" placeholder="Search Identity..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <input type="text" placeholder="Search farmer, phone, village..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
         </div>
       </div>
       <div className="ledger-filters">
@@ -76,10 +82,10 @@ export default function VerifiedLandsList() {
           <thead>
             <tr>
               <th>FARMER IDENTITY</th>
-              <th>NODE HUB</th>
+              <th>ADDRESS CONTEXT</th>
               <th>UNIT PROFILE</th>
-              <th>PUBLISH IN-APP</th>
-              <th>AUDIT</th>
+              <th>ADDED BY</th>
+              <th>ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -87,46 +93,50 @@ export default function VerifiedLandsList() {
               <tr>
                 <td colSpan="5" style={{ textAlign: 'center', padding: '24px' }}>Loading...</td>
               </tr>
+            ) : loadError ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '24px', color: '#991b1b' }}>{loadError}</td>
+              </tr>
             ) : filteredLands.length === 0 ? (
               <tr>
                 <td colSpan="5" style={{ textAlign: 'center', padding: '24px' }}>No verified lands found.</td>
               </tr>
             ) : filteredLands.map((land) => {
               const farmer = land.farmerDetails || {};
-              const name = farmer.farmer_name || 'UNKNOWN';
-              const code = `L${String(land.id).padStart(3, '0')}`;
-              const location = land.village || land.mandal || 'N/A';
-              const unit = 'N/A'; // Mock for now until land units logic exists
-              const published = false;
+              const name = farmer.name || 'UNKNOWN';
+              const code = landCode(land);
 
               return (
               <tr key={land.id}>
                 <td>
                   <div className="farmer-identity">
                     <span className="farmer-name">{name}</span>
-                    <span className="farmer-code">{code}</span>
+                    <span className="farmer-code">{code}{farmer.phone ? ` • ${farmer.phone}` : ''}</span>
                   </div>
                 </td>
                 <td>
                   <div className="node-hub">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                    {location}
+                    {landAddress(land)}
                   </div>
                 </td>
                 <td>
-                  <span className="unit-profile">{unit}</span>
+                  <span className="unit-profile">{landUnitProfile(land)}</span>
                 </td>
                 <td>
-                  <div className={`publish-dropdown ${published ? 'published' : 'empty'}`}>
-                    {published ? 'Published' : ''}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+                  <span className="unit-profile">{land.creator?.name || executiveName(land.created_by)}</span>
+                </td>
+                <td>
+                  <div className="ledger-row-actions">
+                    <button className="action-btn view" onClick={() => onView(land)}>VIEW</button>
+                    <button className="action-btn start" onClick={() => onEdit(land)}>
+                      OPEN FILE
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                    </button>
+                    <button className="action-btn delete" onClick={() => handleDelete(land)} title="Delete land" aria-label="Delete land">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+                    </button>
                   </div>
-                </td>
-                <td>
-                  <button className="action-btn open-file">
-                    OPEN FILE
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                  </button>
                 </td>
               </tr>
               );

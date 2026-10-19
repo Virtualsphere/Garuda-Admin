@@ -225,6 +225,34 @@
   --sidebar-divider: #e5e7eb;
 }
 
+/* ═══════════════════════════════════════
+   THEME: Locations (Teal)
+   ═══════════════════════════════════════ */
+[data-theme="locations"] {
+  --accent: #0d9488;
+  --accent-dark: #0f766e;
+  --accent-light: #ccfbf1;
+  --accent-lighter: #f0fdfa;
+  --accent-border: #99f6e4;
+  --accent-gradient: linear-gradient(135deg, #0d9488, #14b8a6);
+  --accent-shadow: rgba(13, 148, 136, 0.25);
+  --accent-shadow-lg: rgba(13, 148, 136, 0.4);
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-width: 200px;
+  --sidebar-text: #6b7280;
+  --sidebar-text-hover: #1a1a2e;
+  --sidebar-active: #0d9488;
+  --sidebar-active-bg: rgba(13, 148, 136, 0.08);
+  --sidebar-icon: #9ca3af;
+  --sidebar-logo-text: #1a1a2e;
+  --sidebar-border: #e5e7eb;
+  --sidebar-user-name: #1a1a2e;
+  --sidebar-user-email: #6b7280;
+  --sidebar-divider: #e5e7eb;
+}
+
 html {
   font-size: 14px;
 }

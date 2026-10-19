@@ -1,0 +1,314 @@
+/* ── Locations Page ── */
+.loc-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 24px 16px;
+}
+
+.loc-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-white);
+  border: 2px solid var(--border);
+  border-top: 6px solid var(--accent);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.loc-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 24px 16px;
+}
+
+.loc-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.loc-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.loc-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.loc-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 240px;
+  padding: 8px 16px;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-muted);
+}
+
+.loc-search input {
+  width: 100%;
+  background: transparent;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+/* ── Context selectors & add form ── */
+.loc-context,
+.loc-add-form {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 24px 16px;
+  padding: 16px;
+  background: var(--accent-lighter);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-lg);
+}
+
+.loc-add-form {
+  background: var(--bg-main);
+  border-color: var(--border);
+}
+
+.loc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 200px;
+}
+
+.loc-field--grow {
+  flex: 1;
+}
+
+.loc-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.loc-field select,
+.loc-field input {
+  padding: 9px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+.loc-field select:focus,
+.loc-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.loc-field select:disabled,
+.loc-field input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.loc-primary-btn,
+.loc-ghost-btn,
+.loc-clear-btn {
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.loc-primary-btn {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.loc-primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loc-ghost-btn,
+.loc-clear-btn {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.loc-ghost-btn:hover,
+.loc-clear-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.loc-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 24px 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.loc-alert.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.loc-alert.success {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.loc-alert button {
+  font-size: 18px;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ── Table ── */
+.loc-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.loc-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.loc-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 12px 24px;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border-light);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.loc-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.loc-table tbody tr.is-editing {
+  background: var(--accent-lighter);
+}
+
+.loc-table tbody td {
+  padding: 14px 24px;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.loc-name {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.loc-meta {
+  color: var(--text-secondary);
+}
+
+.loc-col-actions {
+  text-align: right !important;
+}
+
+.loc-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loc-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.loc-icon-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent) !important;
+}
+
+.loc-icon-btn.danger:hover {
+  color: var(--red);
+  border-color: var(--red) !important;
+}
+
+.loc-icon-btn svg,
+.loc-drill-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.loc-drill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 14px;
+  background: var(--accent) !important;
+  color: #ffffff;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.loc-empty {
+  padding: 40px 24px !important;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .loc-page {
+    padding: 0 12px 12px;
+  }
+
+  .loc-field {
+    min-width: 100%;
+  }
+}

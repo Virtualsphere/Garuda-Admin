@@ -444,3 +444,85 @@
   font-size: 10px;
   color: var(--text-muted);
 }
+
+/* ── Row actions (view / edit / delete) ── */
+.ledger-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn.view {
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 20px;
+}
+
+.action-btn.view:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.action-btn.delete {
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 7px;
+  border-radius: 50%;
+}
+
+.action-btn.delete:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* ── Page notices & empty states ── */
+.land-data-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 24px 12px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.land-data-notice.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.land-data-notice button {
+  font-size: 18px;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+}
+
+.land-data-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  background: var(--bg-white);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.land-data-content > .add-land-form-container {
+  overflow-y: auto;
+}
+
+.verification-sub-tabs {
+  flex-wrap: wrap;
+}
