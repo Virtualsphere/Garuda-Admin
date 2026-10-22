@@ -274,6 +274,13 @@ export default function LandForm({ value, onChange, onError }) {
     }
   };
 
+  const toggleMediaPublic = (index) => {
+    onChange((prev) => ({
+      ...prev,
+      media: (prev.media || []).map((m, i) => (i === index ? { ...m, public: !m.public } : m)),
+    }));
+  };
+
   const removeMedia = (index) => {
     onChange((prev) => ({ ...prev, media: (prev.media || []).filter((_, i) => i !== index) }));
   };
@@ -620,6 +627,14 @@ export default function LandForm({ value, onChange, onError }) {
                     <img src={mediaUrl(item.url)} alt={item.category} onError={(e) => { e.currentTarget.src = IMAGE_NOT_FOUND_PLACEHOLDER; }} />
                   )}
                   <span className="lf-gallery-caption">{String(item.category || '').replace(/_/g, ' ')}</span>
+                  <button
+                    type="button"
+                    className={`lf-gallery-public${item.public ? ' is-public' : ''}`}
+                    onClick={() => toggleMediaPublic(index)}
+                    title={item.public ? 'Public (click to make private)' : 'Private (click to make public)'}
+                  >
+                    {item.public ? '✓ Public' : 'Private'}
+                  </button>
                   <button type="button" className="lf-gallery-remove" onClick={() => removeMedia(index)} aria-label="Remove">×</button>
                 </div>
               ))}
