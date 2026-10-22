@@ -323,6 +323,27 @@
   text-transform: uppercase;
 }
 
+.lf-gallery-public {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  padding: 2px 6px;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px;
+  background: var(--bg-main) !important;
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.lf-gallery-public.is-public {
+  border-color: var(--green) !important;
+  background: var(--green) !important;
+  color: #ffffff;
+}
+
 .lf-gallery-remove {
   position: absolute;
   top: 4px;
