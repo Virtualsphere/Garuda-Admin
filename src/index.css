@@ -253,6 +253,34 @@
   --sidebar-divider: #e5e7eb;
 }
 
+/* ═══════════════════════════════════════
+   THEME: Listings (Orange — Garuda listing forms)
+   ═══════════════════════════════════════ */
+[data-theme="listings"] {
+  --accent: #ea6a1e;
+  --accent-dark: #c2541a;
+  --accent-light: #fde8d7;
+  --accent-lighter: #fff6ef;
+  --accent-border: #f8b98e;
+  --accent-gradient: linear-gradient(135deg, #ea6a1e, #f59e0b);
+  --accent-shadow: rgba(234, 106, 30, 0.2);
+  --accent-shadow-lg: rgba(234, 106, 30, 0.4);
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-width: 200px;
+  --sidebar-text: #6b7280;
+  --sidebar-text-hover: #1a1a2e;
+  --sidebar-active: #ea6a1e;
+  --sidebar-active-bg: rgba(234, 106, 30, 0.08);
+  --sidebar-icon: #9ca3af;
+  --sidebar-logo-text: #1a1a2e;
+  --sidebar-border: #e5e7eb;
+  --sidebar-user-name: #1a1a2e;
+  --sidebar-user-email: #6b7280;
+  --sidebar-divider: #e5e7eb;
+}
+
 html {
   font-size: 14px;
 }

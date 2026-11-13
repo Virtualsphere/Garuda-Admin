@@ -47,6 +47,28 @@ const locationService = {
     const { data } = await apiClient.delete(`/location/${LEVEL_PATH[level]}/${id}`);
     return data;
   },
+
+  /**
+   * Bulk import from an Excel (.xlsx) / CSV sheet: State | District | Mandal | Village | Town.
+   * `commit: false` is a dry run — the backend only returns the preview.
+   */
+  async importFile(file, { commit = false } = {}) {
+    const body = new FormData();
+    body.append('file', file);
+    const { data } = await apiClient.post('/location/import', body, {
+      params: { commit },
+      headers: { 'Content-Type': 'multipart/form-data' },
+      // Large state lists (~20k villages) take longer than the 15s default.
+      timeout: 180000,
+    });
+    return data;
+  },
+
+  /** Downloads the blank import template as a Blob. */
+  async downloadImportTemplate() {
+    const { data } = await apiClient.get('/location/import/template', { responseType: 'blob' });
+    return data;
+  },
 };
 
 export default locationService;

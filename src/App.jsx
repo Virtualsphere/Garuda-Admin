@@ -20,6 +20,7 @@ import SettingsPage from './components/Settings/SettingsPage';
 import BuyersPage from './components/Buyers/BuyersPage';
 import BuyersDepartmentPage from './components/Buyers/BuyersDepartmentPage';
 import LocationsPage from './components/Locations/LocationsPage';
+import ListingsPage from './components/Listings/ListingsPage';
 import './App.css';
 
 const callCenterTopTabs = [
@@ -85,6 +86,13 @@ const locationsTopTabs = [
   { key: 'mandals', label: 'Mandals', icon: 'grid' },
   { key: 'villages', label: 'Villages', icon: 'pin' },
   { key: 'roads', label: 'Roads & paths', icon: 'send' },
+];
+
+const listingsTopTabs = [
+  { key: 'home', label: 'Home', icon: 'house' },
+  { key: 'plot', label: 'Plot', icon: 'map' },
+  { key: 'venture', label: 'Venture', icon: 'grid' },
+  { key: 'villa', label: 'Villa', icon: 'building' },
 ];
 
 function TopTabIcon({ type }) {
@@ -210,6 +218,13 @@ function TopTabIcon({ type }) {
           <path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01" />
         </svg>
       );
+    case 'house':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -226,6 +241,7 @@ export default function App() {
   const [activeTabHR, setActiveTabHR] = useState('allemployees');
   const [activeTabSettings, setActiveTabSettings] = useState('visiting');
   const [activeTabLocations, setActiveTabLocations] = useState('states');
+  const [activeTabListings, setActiveTabListings] = useState('home');
 
   // Handle theme switching
   useEffect(() => {
@@ -245,6 +261,8 @@ export default function App() {
       document.documentElement.setAttribute('data-theme', 'settings');
     } else if (activeSection === 'locations') {
       document.documentElement.setAttribute('data-theme', 'locations');
+    } else if (activeSection === 'listings') {
+      document.documentElement.setAttribute('data-theme', 'listings');
     } else {
       document.documentElement.setAttribute('data-theme', 'callcenter');
     }
@@ -274,6 +292,9 @@ export default function App() {
   } else if (activeSection === 'locations') {
     topTabs = locationsTopTabs;
     activeTab = activeTabLocations;
+  } else if (activeSection === 'listings') {
+    topTabs = listingsTopTabs;
+    activeTab = activeTabListings;
   }
   
   if (!isAuthenticated) {
@@ -295,6 +316,8 @@ export default function App() {
       setActiveTabSettings(key);
     } else if (activeSection === 'locations') {
       setActiveTabLocations(key);
+    } else if (activeSection === 'listings') {
+      setActiveTabListings(key);
     } else {
       setActiveTabCallCenter(key);
     }
@@ -412,11 +435,14 @@ export default function App() {
           )}
 
           {/* For other sections, show placeholder */}
-          {activeSection !== 'callcenter' && activeSection !== 'land' && activeSection !== 'farmers' && activeSection !== 'buyers' && activeSection !== 'agents' && activeSection !== 'hr' && activeSection !== 'settings' && activeSection !== 'locations' && (
+          {activeSection !== 'callcenter' && activeSection !== 'land' && activeSection !== 'farmers' && activeSection !== 'buyers' && activeSection !== 'agents' && activeSection !== 'hr' && activeSection !== 'settings' && activeSection !== 'locations' && activeSection !== 'listings' && (
             <div style={{ padding: '24px', color: 'var(--text-muted)' }}>Section coming soon...</div>
           )}
           {activeSection === 'agents' && (
             <AgentsModule activeTab={activeTab} />
+          )}
+          {activeSection === 'listings' && (
+            <ListingsPage key={activeTab} activeTab={activeTab} />
           )}
           {activeSection === 'hr' && (
             <HRPage activeTab={activeTab} />

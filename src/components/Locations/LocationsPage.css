@@ -312,3 +312,17 @@
     min-width: 100%;
   }
 }
+
+/* ── Header tools: search + bulk import ── */
+.loc-header-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.loc-import-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

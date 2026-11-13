@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import locationService from '../../services/locationService';
+import LocationImportModal from './LocationImportModal';
 import './LocationsPage.css';
 
 /**
@@ -87,6 +88,9 @@ export default function LocationsPage({ activeTab, onTabChange }) {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
+  const [showImport, setShowImport] = useState(false);
+  // Bumped after a bulk import so the context dropdowns re-fetch too.
+  const [reloadKey, setReloadKey] = useState(0);
 
   const parentIdFor = useCallback(
     (tab) => {
@@ -119,7 +123,7 @@ export default function LocationsPage({ activeTab, onTabChange }) {
       .list('districts', stateId)
       .then((data) => setDistricts(unwrap(data).sort(byName)))
       .catch((err) => console.error('Failed to load districts:', err));
-  }, [stateId]);
+  }, [stateId, reloadKey]);
 
   useEffect(() => {
     setMandals([]);
@@ -128,7 +132,7 @@ export default function LocationsPage({ activeTab, onTabChange }) {
       .list('mandals', districtId)
       .then((data) => setMandals(unwrap(data).sort(byName)))
       .catch((err) => console.error('Failed to load mandals:', err));
-  }, [districtId]);
+  }, [districtId, reloadKey]);
 
   // ─── Rows for the active level ─────────────────────────────────
   const loadRows = useCallback(async () => {
@@ -274,6 +278,16 @@ export default function LocationsPage({ activeTab, onTabChange }) {
     }
   };
 
+  const handleImported = async () => {
+    setReloadKey((k) => k + 1);
+    try {
+      await loadStates();
+    } catch (err) {
+      console.error('Failed to reload states:', err);
+    }
+    await loadRows();
+  };
+
   if (!level) {
     return <div style={{ padding: '24px', color: 'var(--text-muted)' }}>Page coming soon...</div>;
   }
@@ -292,11 +306,19 @@ export default function LocationsPage({ activeTab, onTabChange }) {
             <span className="loc-title">{level.title}</span>
             <span className="loc-subtitle">{level.subtitle}</span>
           </div>
-          <div className="loc-search">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input type="text" placeholder={`Search ${activeTab}...`} value={search} onChange={(e) => setSearch(e.target.value)} />
+          <div className="loc-header-tools">
+            <div className="loc-search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input type="text" placeholder={`Search ${activeTab}...`} value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
+            <button type="button" className="loc-ghost-btn loc-import-btn" onClick={() => setShowImport(true)}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              Import Excel
+            </button>
           </div>
         </div>
 
@@ -409,6 +431,10 @@ export default function LocationsPage({ activeTab, onTabChange }) {
           )}
         </div>
       </div>
+
+      {showImport && (
+        <LocationImportModal onClose={() => setShowImport(false)} onImported={handleImported} />
+      )}
     </div>
   );
 }
