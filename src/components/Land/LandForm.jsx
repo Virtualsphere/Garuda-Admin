@@ -360,6 +360,7 @@ export default function LandForm({ value, onChange, onError }) {
             <Select label="Age" value={farmer.age} onChange={(v) => set('farmerDetails.age', v)} options={AGE_OPTIONS} />
             <Select label="Literacy" value={farmer.literacy} onChange={(v) => set('farmerDetails.literacy', v)} options={LITERACY_OPTIONS} />
             <Select label="Nature" value={farmer.nature} onChange={(v) => set('farmerDetails.nature', v)} options={NATURE_OPTIONS} />
+            <Field label="Agent number" type="tel" value={value.agent_number ?? ''} onChange={(v) => set('agent_number', v)} placeholder="Agent phone number" full />
           </div>
         </Card>
 

@@ -129,6 +129,7 @@ export const createEmptyLand = () => ({
   mortage_availability_status: [],
   urgency_listing: [],
   verification_package: false,
+  agent_number: '',
   form_status: 'draft',
   farmerDetails: emptyFarmerDetails(),
   landDetails: emptyLandDetails(),

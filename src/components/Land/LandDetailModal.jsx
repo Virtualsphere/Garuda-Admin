@@ -113,6 +113,7 @@ export default function LandDetailModal({ landId, onClose, onEdit }) {
                 <div className="ldm-row"><span className="ldm-label">Phone verification</span><StatusPill status={land.call_verification_status} /></div>
                 <div className="ldm-row"><span className="ldm-label">Physical verification</span><StatusPill status={land.physcial_verification_status} /></div>
                 <div className="ldm-row"><span className="ldm-label">Final verification</span><StatusPill status={land.verification_status} /></div>
+                <Row label="Agent number" value={form.agent_number} />
                 <Row label="Created by" value={land.creator?.name} />
                 <Row label="Created on" value={land.created_at ? new Date(land.created_at).toLocaleString() : ''} />
               </section>
